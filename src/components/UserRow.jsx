@@ -32,7 +32,7 @@ const UserRow = ({ handlerDeleteUser, handlerSelectedUserForm, id, username, ema
 };
 
 UserRow.propTypes = {
-  id: PropTypes.node.isRequired,
+  id: PropTypes.number.isRequired,
   username: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
   handlerDeleteUser: PropTypes.func.isRequired,

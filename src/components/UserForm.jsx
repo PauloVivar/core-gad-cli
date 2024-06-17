@@ -20,6 +20,7 @@ import { useEffect } from 'react';
 
 //Validation Schema
 const formSchema = z.object({
+  id: z.number(),
   username: z.string().min(2, {
     message: 'El nombre de usuario debe tener al menos 2 caracteres.',
   }),
@@ -43,32 +44,33 @@ function UserForm({initialUserForm, handlerAddUser, userSelected}) {
   // 2. Define a submit handler.
   const onSubmit = (userForm) => {
     //console.log(typeof userForm);
-    console.log('user_form: ', userForm);
+    //console.log('user_form: ', userForm.username);
     handlerAddUser(userForm);
-    //form.reset();
+    form.reset();
   }
 
-  // 3. Selecccionar rows de tabla user
-  // useEffect(()=>{
-  //   async function loadUser(){
-  //     if (userSelected){
-  //       const user = await {
-  //         ...userSelected, 
-  //         password:'',
-  //       };
-  //       //console.log(userSelected);
-  //       form.setValue('username', user.username);
-  //       form.setValue('email', user.email);
-  //       form.setValue('password', user.password);
-  //     }
-  //   }
-  //   loadUser()
+  //3. Selecccionar rows de tabla user
+  useEffect(()=>{
+    async function loadUser(){
+      if (userSelected){
+        const user = await {
+          ...userSelected, 
+          password:'',
+        };
+        console.log('use_Effect: ',user.id);
+        form.setValue('id', user.id);
+        form.setValue('username', user.username);
+        form.setValue('email', user.email);
+        form.setValue('password', user.password);
+      }
+    }
+    loadUser()
     
-  //   // setData({
-  //   //     ...userSelected,
-  //   //     password:'',
-  //   // });
-  // },[userSelected]);
+    // setData({
+    //     ...userSelected,
+    //     password:'',
+    // });
+  },[form, userSelected]);
 
   return (
     <>
@@ -124,25 +126,15 @@ function UserForm({initialUserForm, handlerAddUser, userSelected}) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input type='hidden' {...field} />
+                    <Input {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
 
-            {/* <FormField
-              control={form.control}
-              name='id'
-              render={({ field }) => (
-                <FormControl>
-                  <Button type='submit' {...field} >
-                    { field.id > 0 ? 'Actualizar' : 'Crear' }
-                  </Button>
-                </FormControl>
-              )}
-            /> */}
-
-            <Button type='submit'>Crear</Button>
+            <Button type='submit'>
+              { userSelected.id === 0 ? 'Crear' : 'Actualizar' }
+            </Button>
 
           </form>
         </Form>

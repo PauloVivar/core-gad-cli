@@ -32,19 +32,15 @@ function App() {
   const [userSelected, setUserSelected] = useState(initialUserForm);
 
   const handlerAddUser = (user) => {
-    //console.log('en handlerAddUser ',user);
+    
     let type;
-    
-    type = 'addUser';
-    
-
-    (user.id === 0) ? console.log('1') : console.log('2')
-    console.log(user.id);   
-
-    //type = 'updateUser'
+    if(user.id === 0){
+      type = 'addUser';
+    }else{
+      type = 'updateUser';
+    }
 
     dispatch({
-      //type: 'addUser',
       type,
       payload: user,
     });
