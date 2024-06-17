@@ -34,16 +34,12 @@ function LoginPage() {
             </CardHeader>
             <CardContent className='space-y-2'>
               <div className='space-y-1'>
-                <Label htmlFor='name'>Name</Label>
-                <Input id='name' defaultValue='Pedro Duarte' />
+                <Label htmlFor='name'>Email</Label>
+                <Input id='name' defaultValue='roman.redrovan@mail.com' />
               </div>
               <div className='space-y-1'>
-                <Label htmlFor='username'>Username</Label>
-                <Input id='username' defaultValue='@peduarte' />
-              </div>
-              <div className='space-y-1'>
-                <Label htmlFor='current'>Current password</Label>
-                <Input id='current' type='password' />
+                <Label htmlFor='password'>Password</Label>
+                <Input id='password' type='password' />
               </div>
             </CardContent>
             <CardFooter>
