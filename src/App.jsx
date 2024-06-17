@@ -37,9 +37,14 @@ function App() {
     
     type = 'addUser';
     
-
-    (user.id === 0) ? console.log('1') : console.log('2')
-    console.log(user.id);   
+    // if (user.id === 0){
+    //   console.log('1')
+    // }else{
+    //   console.log('2')
+    // }
+    // console.log(user.id);
+    // console.log(user.username);
+    // console.log(user.email); 
 
     //type = 'updateUser'
 

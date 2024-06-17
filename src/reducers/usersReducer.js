@@ -19,8 +19,10 @@ const usersReducer = (state = [], action) => {
         if (user.id === action.payload.id) {
           return {
             ...action.payload,
+            
           };
         }
+        
         return user;
       });
 
