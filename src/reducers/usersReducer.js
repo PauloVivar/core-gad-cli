@@ -19,7 +19,7 @@ const usersReducer = (state = [], action) => {
         if (user.id === action.payload.id) {
           return {
             ...action.payload,
-            
+            password: user.password, //para ocultar input password de form
           };
         }
         
