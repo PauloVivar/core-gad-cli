@@ -16,7 +16,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import Swal from 'sweetalert2';
+
 
 //Validation Schema
 const formSchema = z.object({
@@ -67,11 +67,6 @@ function UserForm({initialUserForm, handlerAddUser, userSelected, handlerCloseFo
       }
     }
     loadUser()
-    
-    // setData({
-    //     ...userSelected,
-    //     password:'',
-    // });
   },[form, userSelected]);
 
   const onCloseForm = () => {

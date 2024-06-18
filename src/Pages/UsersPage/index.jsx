@@ -1,16 +1,14 @@
-import './App.css';
-import { useUsers } from './hooks/useUsers';
+import { useUsers } from '../../hooks/useUsers';
 
-import { UserForm } from './components/UserForm';
-import { UsersList } from './components/UsersList';
+import { UserForm } from '../../components/UserForm';
+import { UsersList } from '../../components/UsersList';
 
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 
-function App() {
-
-  const { 
+function UsersPage() {
+  const {
     users,
     userSelected,
     initialUserForm,
@@ -20,30 +18,27 @@ function App() {
     handlerSelectedUserForm,
     handlerOpenForm,
     handlerCloseForm,
-   } = useUsers();
+  } = useUsers();
 
   return (
     <>
       <div className='w-[90%] h-full m-4 justify-center items-center'>
-        <h1 className='text-3xl font-bold underline'>Gad Azogues</h1>
+        <h1 className='text-3xl font-bold underline'>Usuarios</h1>
 
         <div className='flex flex-row gap-4 justify-center'>
-          
-            {!visibleForm ||
-              <div className=''>
-                <UserForm
-                  initialUserForm={initialUserForm}
-                  userSelected={userSelected}
-                  handlerAddUser={handlerAddUser}
-                  handlerCloseForm={handlerCloseForm}
-                />
-              </div>
-            }
-          
+          {!visibleForm || (
+            <div className=''>
+              <UserForm
+                initialUserForm={initialUserForm}
+                userSelected={userSelected}
+                handlerAddUser={handlerAddUser}
+                handlerCloseForm={handlerCloseForm}
+              />
+            </div>
+          )}
+
           <div className=''>
-            {visibleForm ||
-              <Button onClick={handlerOpenForm}>Agregar Usuario</Button>
-            }
+            {visibleForm || <Button onClick={handlerOpenForm}>Agregar Usuario</Button>}
             {users.length === 0 ? (
               <Alert variant='destructive'>
                 <AlertCircle className='h-4 w-4' />
@@ -66,4 +61,4 @@ function App() {
   );
 }
 
-export default App;
+export { UsersPage };
