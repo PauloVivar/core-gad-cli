@@ -1,4 +1,6 @@
+
 import { useReducer } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 
 import { LoginPage } from '../LoginPage';
 import { UsersPage } from '../UsersPage';
@@ -49,14 +51,16 @@ function App() {
 
   return (
     <>
-      {
-        login.isAuth
-        ? <>
-          <Navbar />
-          {/* <UsersPage />  */}
-        </>
-        : <LoginPage handlerLogin={ handlerLogin } />
-      }
+      <BrowserRouter>
+        {
+          login.isAuth
+          ? <>
+            <Navbar handlerLogout={ handlerLogout } />
+            <UsersPage /> 
+          </>
+          : <LoginPage handlerLogin={ handlerLogin } />
+        }
+      </BrowserRouter>
     </>
   );
 }

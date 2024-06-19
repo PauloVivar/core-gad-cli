@@ -1,22 +1,19 @@
-import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import {
   BellAlertIcon,
   InboxStackIcon,
-  // UserCircleIcon,
-  // HomeIcon,
-  // PresentationChartBarIcon,
-  // Bars3Icon,
-  // MagnifyingGlassIcon,
-  // ShoppingCartIcon,
-  // UsersIcon,
-  // InboxIcon,
+  UserCircleIcon,
+  HomeIcon,
+  PresentationChartBarIcon,
+  Bars3Icon,
+  MagnifyingGlassIcon,
+  ShoppingCartIcon,
+  UsersIcon,
+  InboxIcon,
 } from '@heroicons/react/24/solid';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,26 +22,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+
+import { Layout } from '../Layout';
+import { NewCard } from '../NewCard';
 
 const Navbar = () => {
   return (
     <div className='grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
       <div className='hidden border-r bg-muted/40 md:block'>
         <div className='flex h-full max-h-screen flex-col gap-2'>
-          <div>hola mundo</div>
 
+          {/* Logo Azogues */}
           <div className='flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6'>
-            <nav>
-              <ul>
-                <li className='flex items-center gap-2 font-semibold'>
-                  <NavLink></NavLink>
-                  <InboxStackIcon className='h-6 w-6' />
-                  <span className=''>Alcaldía Azogues</span>
-                </li>
-              </ul>
-            </nav>
+            <NavLink className='flex items-center gap-2 font-semibold'>
+              <InboxStackIcon className='h-6 w-6' />
+              <span className=''>Alcaldía Azogues</span>
+            </NavLink>
 
             <Button
               variant='outline'
@@ -55,7 +53,8 @@ const Navbar = () => {
             </Button>
           </div>
 
-          {/* <div className='flex-1'>
+          {/* Navbar */}
+          <div className='flex-1'>
             <nav className='grid items-start px-2 text-sm font-medium lg:px-4'>
               <NavLink
                 to='/'
@@ -91,29 +90,17 @@ const Navbar = () => {
                 Analytics
               </NavLink>
             </nav>
-          </div> */}
+          </div>
 
-          {/* <div className='mt-auto p-4'>
-            <Card x-chunk='dashboard-02-chunk-0'>
-              <CardHeader className='p-2 pt-0 md:p-4'>
-                <CardTitle>Upgrade to Pro</CardTitle>
-                <CardDescription>
-                  Unlock all features and get unlimited access to our support team.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className='p-2 pt-0 md:p-4 md:pt-0'>
-                <Button
-                  size='sm'
-                  className='w-full'>
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
-          </div> */}
+          {/* Card */}
+          <div className='mt-auto p-4'>
+            <NewCard />
+          </div>
+
         </div>
       </div>
 
-      {/* <div className='flex flex-col'>
+      <div className='flex flex-col'>
         <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6'>
           <Sheet>
             <SheetTrigger asChild>
@@ -129,24 +116,26 @@ const Navbar = () => {
             <SheetContent
               side='left'
               className='flex flex-col'>
+
+              {/* Navbar movile */}
               <nav className='grid gap-2 text-lg font-medium'>
                 <NavLink
                   to='/'
                   className='flex items-center gap-2 text-lg font-semibold'>
                   <InboxStackIcon className='h-6 w-6' />
-                  <span className='sr-only'>Acme Inc</span>
+                  <span className='sr-only'>Alcaldía Azogues</span>
                 </NavLink>
                 <NavLink
                   to='/'
                   className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground'>
                   <HomeIcon className='h-5 w-5' />
-                  Dashboard
+                  Dashboard2
                 </NavLink>
                 <NavLink
                   to='/'
                   className='mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground'>
                   <ShoppingCartIcon className='h-5 w-5' />
-                  Orders
+                  Orders2
                   <Badge className='ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full'>
                     6
                   </Badge>
@@ -155,54 +144,45 @@ const Navbar = () => {
                   to='/'
                   className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground'>
                   <InboxIcon className='h-5 w-5' />
-                  Products
+                  Products2
                 </NavLink>
                 <NavLink
                   to='/'
                   className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground'>
                   <UsersIcon className='h-5 w-5' />
-                  Customers
+                  Customers2
                 </NavLink>
                 <NavLink
                   to='/'
                   className='mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground'>
                   <PresentationChartBarIcon className='h-5 w-5' />
-                  Analytics
+                  Analytics2
                 </NavLink>
               </nav>
+
+              {/* Card */}
               <div className='mt-auto'>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upgrade to Pro</CardTitle>
-                    <CardDescription>
-                      Unlock all features and get unlimited access to our support team.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button
-                      size='sm'
-                      className='w-full'>
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card>
+                <NewCard />
               </div>
+
             </SheetContent>
           </Sheet>
 
+          {/* Input Buscar */}
           <div className='w-full flex-1'>
             <form>
               <div className='relative'>
                 <MagnifyingGlassIcon className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
                 <Input
                   type='search'
-                  placeholder='MagnifyingGlassIcon products...'
+                  placeholder='Buscar...'
                   className='w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3'
                 />
               </div>
             </form>
           </div>
 
+          {/* Menu Usuario */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -222,28 +202,31 @@ const Navbar = () => {
               <DropdownMenuItem>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
         </header>
 
-        <main className='flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6'>
+        {/* Layout */}
+        <Layout />
+
+        {/* <main className='flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6'>
           <div className='flex items-center'>
             <h1 className='text-lg font-semibold md:text-2xl'>Usuarios</h1>
           </div>
 
           <div
             className='flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm'
-            x-chunk='dashboard-02-chunk-1'>
+          >
             <div className='flex flex-col items-center gap-1 text-center'>
               <h3 className='text-2xl font-bold tracking-tight'>No tiene usuarios</h3>
               <p className='text-sm text-muted-foreground'>
-                You can start selling as soon as you add a product.
+                Puede comenzar a crear usuarios tan pronto como agregues uno nuevo..
               </p>
-              <Button className='mt-4'>Add Product</Button>
+              <Button className='mt-4'>Add Cliente</Button>
             </div>
           </div>
-          
-        </main>
+        </main> */}
 
-      </div> */}
+      </div>
     </div>
   );
 };
