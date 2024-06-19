@@ -66,7 +66,7 @@ const Navbar = ({ login, handlerLogout }) => {
                 to='/'
                 className='flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary'>
                 <InboxIcon className='h-4 w-4' />
-                Trámites{' '}
+                Trámites
               </NavLink>
               <NavLink
                 to='/'
@@ -79,6 +79,12 @@ const Navbar = ({ login, handlerLogout }) => {
                 className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'>
                 <PresentationChartBarIcon className='h-4 w-4' />
                 Atención Ciudadana
+              </NavLink>
+              <NavLink
+                to='/users'
+                className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'>
+                <PresentationChartBarIcon className='h-4 w-4' />
+                Usuarios{' '}
               </NavLink>
             </nav>
           </div>

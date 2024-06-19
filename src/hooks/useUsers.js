@@ -1,4 +1,6 @@
 import { useReducer, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { usersReducer } from '../reducers/usersReducer';
 import Swal from 'sweetalert2';
 
@@ -20,7 +22,7 @@ const initialUserForm = {
 };
 
 const useUsers = () => {
-  //Reducer para CRUD Front
+  //Reducer para CRUD en el Frond
   const [users, dispatch] = useReducer(usersReducer, initialUsers);
 
   //Estado para selecionar row de tabla usuarios para update
@@ -28,6 +30,9 @@ const useUsers = () => {
 
   //Estado para ocultar formulario
   const [visibleForm, setVisibleForm] = useState(false);
+
+  //Navigate para redirigir a UsersPage
+  const navigate = useNavigate();
 
   const handlerAddUser = (user) => {
     
@@ -52,6 +57,9 @@ const useUsers = () => {
 
     //Form oculto y reseteado
     handlerCloseForm();
+
+    //Redirigir a UsersPage
+    navigate('/users');
   };
 
   const handlerDeleteUser = (id) => {
