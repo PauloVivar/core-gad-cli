@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import { AuthContext } from '@/Auth/Context/AuthContext';
 
 //Icons
 import {
@@ -17,12 +19,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 //Components
-import { Layout } from '../Layout';
 import { NewCard } from '../NewCard';
 import { SearchInput } from './SearchInput';
 import { UserMenu } from './UserMenu';
 
-const Navbar = ({ login, handlerLogout }) => {
+const Navbar = () => {
+
+  const { login, handlerLogout } = useContext(AuthContext);
+
   return (
     <div className='grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
       <div className='hidden border-r bg-muted/40 md:block'>
@@ -85,6 +89,12 @@ const Navbar = ({ login, handlerLogout }) => {
                 className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'>
                 <PresentationChartBarIcon className='h-4 w-4' />
                 Usuarios{' '}
+              </NavLink>
+              <NavLink
+                to='/users/register'
+                className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'>
+                <PresentationChartBarIcon className='h-4 w-4' />
+                Registar Usuarios{' '}
               </NavLink>
             </nav>
           </div>

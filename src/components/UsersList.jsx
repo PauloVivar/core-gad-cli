@@ -1,10 +1,8 @@
-import PropTypes from 'prop-types';
 
 import {
   Table,
   TableBody,
   TableCaption,
-  //TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -12,8 +10,13 @@ import {
 
 import { Card } from '@/components/ui/card';
 import { UserRow } from './UserRow';
+import { useContext } from 'react';
+import { UserContext } from '@/Context/UserContext';
 
-const UsersList = ({ users, handlerDeleteUser, handlerSelectedUserForm }) => {
+const UsersList = () => {
+
+  const { users } = useContext(UserContext);
+
   return (
     <>
       <Card className='w-full'>
@@ -35,8 +38,6 @@ const UsersList = ({ users, handlerDeleteUser, handlerSelectedUserForm }) => {
                 id={id}
                 username={username}
                 email={email}
-                handlerDeleteUser={handlerDeleteUser}
-                handlerSelectedUserForm={handlerSelectedUserForm}
               />
             ))}
           </TableBody>
@@ -44,12 +45,6 @@ const UsersList = ({ users, handlerDeleteUser, handlerSelectedUserForm }) => {
       </Card>
     </>
   );
-};
-
-UsersList.propTypes = {
-  users: PropTypes.array.isRequired,
-  handlerDeleteUser: PropTypes.func.isRequired,
-  handlerSelectedUserForm: PropTypes.func.isRequired,
 };
 
 export { UsersList };

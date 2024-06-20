@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -16,6 +16,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { UserContext } from '@/Context/UserContext';
 
 
 //Validation Schema
@@ -32,8 +33,10 @@ const formSchema = z.object({
   }),
 });
 
-function UserForm({initialUserForm, handlerAddUser, userSelected, handlerCloseForm}) {
-  //const { handleSubmit, control } = useForm();
+function UserForm({ userSelected, handlerCloseForm }) {
+
+  //Contexto User Global
+  const { initialUserForm, handlerAddUser } = useContext(UserContext);
 
   // 1. Define your form.
   const form = useForm({
@@ -59,7 +62,7 @@ function UserForm({initialUserForm, handlerAddUser, userSelected, handlerCloseFo
           ...userSelected, 
           password:'',
         };
-        console.log('use_Effect: ',user.id);
+        //console.log('use_Effect: ',user.id);
         form.setValue('id', user.id);
         form.setValue('username', user.username);
         form.setValue('email', user.email);
@@ -139,15 +142,17 @@ function UserForm({initialUserForm, handlerAddUser, userSelected, handlerCloseFo
             <Button type='submit'>
               { userSelected.id === 0 ? 'Crear' : 'Actualizar' }
             </Button>
-            <Button 
-              type='button'
-              className='mx-2'
-              variant='destructive'
-              onClick={ ()=>onCloseForm() }
-            >
-                Cerrar
-            </Button>
-
+            {
+              !handlerCloseForm ||
+              <Button 
+                type='button'
+                className='mx-2'
+                variant='destructive'
+                onClick={ ()=>onCloseForm() }
+              >
+                  Cerrar
+              </Button>
+            }
           </form>
         </Form>
       </Card>
@@ -157,9 +162,8 @@ function UserForm({initialUserForm, handlerAddUser, userSelected, handlerCloseFo
 }
 
 UserForm.propTypes = {
-  initialUserForm: PropTypes.object.isRequired,
-  handlerAddUser: PropTypes.func.isRequired,
   userSelected: PropTypes.object,
+  handlerCloseForm: PropTypes.func,
 }
 
 export { UserForm };

@@ -22,13 +22,17 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useContext } from 'react';
+import { AuthContext } from '@/Auth/Context/AuthContext';
 
 //Validation Schema
 const formSchema = z.object({
   email: z.string().email({
     message: 'Ingrese un email válido.',
   }),
-  password: z.string(),
+  password: z.string().min(5, {
+    message: 'La contraseña de usuario debe tener al menos 5 caracteres.'
+  }),
 });
 
 //const requiredUser = formSchema.required();
@@ -38,8 +42,10 @@ const initialLoginForm = {
   password: '',
 };
 
-function LoginPage({ handlerLogin }) {
+function LoginPage() {
 
+  const { handlerLogin } = useContext(AuthContext);
+  
   // 1. Define your form.
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -108,7 +114,7 @@ function LoginPage({ handlerLogin }) {
                           <FormLabel>Password</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder='Ingres su password'
+                              placeholder='Ingrese su password'
                               {...field}
                             />
                           </FormControl>

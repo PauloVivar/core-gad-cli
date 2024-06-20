@@ -1,12 +1,17 @@
 import PropTypes from 'prop-types';
 
+import { useContext } from 'react';
+import { UserContext } from '@/Context/UserContext';
+import { NavLink } from 'react-router-dom';
+
 import { TableCell, TableRow } from '@/components/ui/table';
-//import { Button } from '@/components/ui/button';
 
 //icons
-import { ArrowPathIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { ArrowPathIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 
-const UserRow = ({ handlerDeleteUser, handlerSelectedUserForm, id, username, email }) => {
+const UserRow = ({ id, username, email }) => {
+
+  const {handlerDeleteUser, handlerSelectedUserForm} = useContext(UserContext);
   
   return (
     <TableRow >
@@ -22,6 +27,9 @@ const UserRow = ({ handlerDeleteUser, handlerSelectedUserForm, id, username, ema
         })}>
           <ArrowPathIcon className='size-5 text-zinc-500 hover:cursor-pointer' />
         </button>
+        <NavLink to={'/users/edit/' + id}>
+          <PencilSquareIcon className='size-5 text-zinc-500 hover:cursor-pointer' />
+        </NavLink>
         <button onClick={()=> handlerDeleteUser(id)}>
           <TrashIcon className='size-5 text-red-500 hover:cursor-pointer' />
         </button>
@@ -35,8 +43,6 @@ UserRow.propTypes = {
   id: PropTypes.number.isRequired,
   username: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
-  handlerDeleteUser: PropTypes.func.isRequired,
-  handlerSelectedUserForm: PropTypes.func.isRequired,
 }
 
 export { UserRow };
