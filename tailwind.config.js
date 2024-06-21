@@ -5,7 +5,7 @@ export default {
   content: [
     "./index.html",
     './pages/**/*.{js,jsx}',
-    './components/**/*.{js,jsx}',
+    './Components/**/*.{js,jsx}',
     './app/**/*.{js,jsx}',
     "./src/**/*.{js,ts,jsx,tsx}",
   ],

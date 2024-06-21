@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { RegisterPage } from '../Pages/RegisterPage';
 import { UsersPage } from '../Pages/UsersPage';
-import { Navbar } from '../components/Navbar';
+import { Navbar } from '../Components/Navbar';
 import { UserProvider } from '../Context/UserProvider';
 
 

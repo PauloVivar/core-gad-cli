@@ -6,9 +6,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/Components/ui/table';
 
-import { Card } from '@/components/ui/card';
+import { Card } from '@/Components/ui/card';
 import { UserRow } from './UserRow';
 import { useContext } from 'react';
 import { UserContext } from '@/Context/UserContext';

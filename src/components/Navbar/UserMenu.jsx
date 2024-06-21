@@ -5,9 +5,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Label } from "@/components/ui/label"
+} from '@/Components/ui/dropdown-menu';
+import { Button } from '@/Components/ui/button';
+import { Label } from "@/Components/ui/label"
 
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 

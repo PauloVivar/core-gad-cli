@@ -14,9 +14,9 @@ import {
   InboxIcon,
 } from '@heroicons/react/24/solid';
 
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
 
 //Components
 import { NewCard } from '../NewCard';

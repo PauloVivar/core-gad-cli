@@ -4,7 +4,7 @@ import { useContext } from 'react';
 import { UserContext } from '@/Context/UserContext';
 import { NavLink } from 'react-router-dom';
 
-import { TableCell, TableRow } from '@/components/ui/table';
+import { TableCell, TableRow } from '@/Components/ui/table';
 
 //icons
 import { ArrowPathIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';

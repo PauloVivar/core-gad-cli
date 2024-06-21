@@ -1,12 +1,12 @@
 import { useContext } from 'react';
 import { UserContext } from '@/Context/UserContext';
 
-import { Layout } from '../../components/Layout';
-import { UserForm } from '../../components/UserForm';
-import { UsersList } from '../../components/UsersList';
+import { Layout } from '../../Components/Layout';
+import { UserForm } from '../../Components/UserForm';
+import { UsersList } from '../../Components/UsersList';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+import { Button } from '@/Components/ui/button';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 function UsersPage() {
