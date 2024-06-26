@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { UserContext } from '@/Context/UserContext';
 
 import { Layout } from '../../Components/Layout';
@@ -17,7 +17,12 @@ function UsersPage() {
     visibleForm,
     handlerOpenForm,
     handlerCloseForm, //ojo
+    getUsers,
   } = useContext(UserContext);
+
+  useEffect( ()=>{
+    getUsers();
+  }, []);
 
   return (
     <Layout>

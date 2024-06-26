@@ -26,7 +26,7 @@ import { useContext } from 'react';
 import { AuthContext } from '@/Auth/Context/AuthContext';
 
 //Validation Schema
-const formSchema = z.object({
+const userSchema = z.object({
   email: z.string().email({
     message: 'Ingrese un email válido.',
   }),
@@ -35,7 +35,7 @@ const formSchema = z.object({
   }),
 });
 
-//const requiredUser = formSchema.required();
+//const requiredUser = userSchema.required();
 
 const initialLoginForm = {
   email: '',
@@ -48,7 +48,7 @@ function LoginPage() {
   
   // 1. Define your form.
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(userSchema),
     defaultValues: initialLoginForm,
   });
 

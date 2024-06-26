@@ -18,31 +18,41 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { UserContext } from '@/Context/UserContext';
 
+//const existingValues = errors;
 
 //Validation Schema
-const formSchema = z.object({
+const userSchema = z.object({
   id: z.number(),
-  username: z.string().min(2, {
-    message: 'El nombre de usuario debe tener al menos 2 caracteres.',
+  username: z.string().min(1, {
+    message: 'El username es requerido.',
   }),
   email: z.string().email({
     message: 'Ingrese un email válido.',
   }),
+  //.refine(
+  //   (value) => !existingValues.includes(value),
+  //   {
+  //     message: 'El valor debe ser único.'
+  //   }
+  // ),
   password: z.string().min(5, {
-    message: 'La contraseña de usuario debe tener al menos 5 caracteres.'
+    message: 'El password debe tener al menos 5 caracteres.'
   }),
+  // username: z.string(),
+  // email: z.string(),
+  // password: z.string(),
 });
 
 function UserForm({ userSelected, handlerCloseForm }) {
 
   //Contexto User Global
-  const { initialUserForm, handlerAddUser } = useContext(UserContext);
+  const { initialUserForm, handlerAddUser, errors } = useContext(UserContext);
 
   // 1. Define your form.
   const form = useForm({
     resolver: 
       (!userSelected.username || !userSelected.password && userSelected.id === 0 || !userSelected.email) ?
-      zodResolver(formSchema) : '',
+      zodResolver(userSchema) : '',
     defaultValues: initialUserForm,
   });
 
@@ -92,7 +102,9 @@ function UserForm({ userSelected, handlerCloseForm }) {
                   <FormControl>
                     <Input placeholder='Ingrese su username' {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {errors?.username}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -105,7 +117,9 @@ function UserForm({ userSelected, handlerCloseForm }) {
                   <FormControl>
                     <Input placeholder='Ingres su email' {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {errors?.email}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -166,4 +180,4 @@ UserForm.propTypes = {
   handlerCloseForm: PropTypes.func,
 }
 
-export { UserForm };
+export { UserForm, userSchema };

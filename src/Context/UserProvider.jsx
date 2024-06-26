@@ -9,11 +9,13 @@ const UserProvider = ({ children }) => {
     userSelected,
     initialUserForm,
     visibleForm,
+    errors,
     handlerAddUser,
     handlerDeleteUser,
     handlerSelectedUserForm,
     handlerOpenForm,
     handlerCloseForm,
+    getUsers,
   } = useUsers();
 
   return (
@@ -22,11 +24,13 @@ const UserProvider = ({ children }) => {
       userSelected,
       initialUserForm,
       visibleForm,
+      errors,
       handlerAddUser,
       handlerDeleteUser,
       handlerSelectedUserForm,
       handlerOpenForm,
-      handlerCloseForm
+      handlerCloseForm,
+      getUsers,
     }}>
       {children}
     </UserContext.Provider>
