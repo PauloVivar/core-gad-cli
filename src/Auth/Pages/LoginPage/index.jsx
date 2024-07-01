@@ -25,10 +25,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { useContext } from 'react';
 import { AuthContext } from '@/Auth/Context/AuthContext';
 
+//mod email
 //Validation Schema
 const userSchema = z.object({
-  email: z.string().email({
-    message: 'Ingrese un email válido.',
+  username: z.string().min(1, {
+    message: 'El username es requerido.',
   }),
   password: z.string().min(5, {
     message: 'La contraseña de usuario debe tener al menos 5 caracteres.'
@@ -38,7 +39,7 @@ const userSchema = z.object({
 //const requiredUser = userSchema.required();
 
 const initialLoginForm = {
-  email: '',
+  username: '',
   password: '',
 };
 
@@ -55,11 +56,11 @@ function LoginPage() {
   // 2. Define a submit handler.
   const onSubmit = (data) => {
     console.log(data);
-    //console.log('prueba', form.getValues().email);
+    //console.log('prueba', form.getValues().username);
 
     // Implementación  del login
     handlerLogin({
-      email: form.getValues().email, 
+      username: form.getValues().username, 
       password: form.getValues().password,
     });
     
@@ -90,14 +91,14 @@ function LoginPage() {
                   <CardContent className='space-y-2'>
                     <FormField
                       control={form.control}
-                      name='email'
+                      name='username'
                       className='space-y-1'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>Username</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder='Ingrese su email'
+                              placeholder='Ingrese su username'
                               {...field}
                             />
                           </FormControl>

@@ -3,6 +3,15 @@ import axios from 'axios';
 //url api
 const BASE_URL = 'http://localhost:8080/api/v1/users';
 
+const config = () => {
+  return {
+    'headers': {
+      'Authorization': sessionStorage.getItem('token'),
+      'Content-Type': 'application/json',
+    }
+  }
+}
+
 const findAll = async () => {
   try {
     const response = await axios.get(BASE_URL);
@@ -19,7 +28,7 @@ const save = async ({ username, email, password }) =>{
       username,
       email,
       password,
-    });
+    }, config());
   } catch (error) {
     throw error;
   }
@@ -31,7 +40,7 @@ const update = async ({ id, username, email }) => {
       username,
       email,
       //password: 'nothing',  //lo realiza el backend UserRequest
-    });
+    }, config());
   } catch (error) {
     throw error;
   }
@@ -39,9 +48,9 @@ const update = async ({ id, username, email }) => {
 
 const remove = async (id) => {
   try {
-    return await axios.delete(`${BASE_URL}/${id}`);
+    return await axios.delete(`${BASE_URL}/${id}`, config());
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 
