@@ -5,7 +5,7 @@ const BASE_URL = 'http://localhost:8080/api/v1/users';
 
 const config = () => {
   return {
-    'headers': {
+    headers: {
       'Authorization': sessionStorage.getItem('token'),
       'Content-Type': 'application/json',
     }
@@ -22,23 +22,25 @@ const findAll = async () => {
   return null;
 };
 
-const save = async ({ username, email, password }) =>{
+const save = async ({ username, email, password, admin }) =>{
   try {
     return await axios.post(BASE_URL, {
       username,
       email,
       password,
+      admin,
     }, config());
   } catch (error) {
     throw error;
   }
 }
 
-const update = async ({ id, username, email }) => {
+const update = async ({ id, username, email, admin }) => {
   try {
     return await axios.put(`${BASE_URL}/${id}`, {
       username,
       email,
+      admin,
       //password: 'nothing',  //lo realiza el backend UserRequest
     }, config());
   } catch (error) {

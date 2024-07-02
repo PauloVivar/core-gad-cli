@@ -1,12 +1,14 @@
-import { useReducer, useState } from 'react';
+import { useContext, useReducer, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { usersReducer } from '../reducers/usersReducer';
-import Swal from 'sweetalert2';
+import { AuthContext } from '@/Auth/Context/AuthContext';
 import { findAll, remove, save, update } from '@/services/useService';
 
+import Swal from 'sweetalert2';
+
 //import { userSchema } from '../Components/UserForm';
-import { z } from 'zod';
+//import { z } from 'zod';
 
 const initialUsers = [
   // {
@@ -23,6 +25,7 @@ const initialUserForm = {
   username: '',
   email: '',
   password: '',
+  admin: false,
 };
 
 const initialErrors = {
@@ -47,10 +50,12 @@ const useUsers = () => {
   //Navigate para redirigir a UsersPage
   const navigate = useNavigate();
 
+  const { handlerLogout } = useContext(AuthContext);
+
   //Jalar la data de la API BACKEND con SPRING BOOT
   const getUsers = async () => {
     const result = await findAll();
-    console.log(result);
+    //console.log(result);
     dispatch({
       type: 'loadingUsers',
       payload: result.data,
@@ -92,43 +97,31 @@ const useUsers = () => {
     } catch (error) {
 
       // if (error instanceof z.ZodError) {
-      //   //console.error('test2', error.errors);
+      //console.error('test2', error.errors);
       //   setErrors(error.response.data);
-
-      // }else if (error.response && error.response.status == 500 && 
-      //   error.response.data?.message?.includes('constraint')) {
-
-      //     if(error.response.data?.message?.includes('users_username_key')){
-      //       console.log({username: 'El username ya existe'});
-      //       setErrors({username: 'El username ya existe'});
-      //     }
-      //     if(error.response.data?.message?.includes('users_email_key')){
-      //       console.log({email: 'El email ya existe'});
-      //       setErrors({email: 'El email ya existe'});
-      //     }
-      // } else {
-      //   throw error;
       // }
 
       //2da forma
       if (error.response && error.response.status == 400) {
-        console.error('prueba',error.response.data);
+        //console.error('prueba',error.response.data);
         setErrors(error.response.data);
       } else if (error.response && error.response.status == 500 &&
         error.response.data?.message?.includes('constraint')) {
 
           if(error.response.data?.message?.includes('users_username_key')){
-            console.log({username: 'El username ya existe'});
+            //console.log({username: 'El username ya existe'});
             setErrors({username: 'El username ya existe'});
           }
           if(error.response.data?.message?.includes('users_email_key')){
-            console.log({username: 'El email ya existe'});
+            //console.log({username: 'El email ya existe'});
             setErrors({email: 'El email ya existe'});
           }
-      } else {
-        throw error;
-      }
+      } else if(error.response.status == 401) {
+        handlerLogout();
 
+      } else {
+          throw error;
+      }
     }
   };
 
@@ -143,22 +136,28 @@ const useUsers = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Si, bórralo!',
-    }).then((result) => {
+    }).then( async(result) => {
       if (result.isConfirmed) {
-        /* eliminar de la db */
-        //console.log(id);
-        remove(id);
-        /* Lógica para eliminar */
-        dispatch({
-          type: 'removeUser',
-          payload: id,
-        });
 
-        Swal.fire({
-          title: 'Eliminado!',
-          text: 'Usuario ha sido eliminado.',
-          icon: 'success',
-        });
+        try {
+           /* eliminar de la db */
+          await remove(id);
+          /* Lógica para eliminar */
+          dispatch({
+            type: 'removeUser',
+            payload: id,
+          });
+          Swal.fire({
+            title: 'Eliminado!',
+            text: 'Usuario ha sido eliminado.',
+            icon: 'success',
+          });
+
+        } catch (error) {
+          if(error.response.status == 401) {
+            handlerLogout();
+          }
+        }
       }
     });
   };

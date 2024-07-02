@@ -17,6 +17,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
+import log_azo from '../../assets/log_azo.jpg';
 
 //Components
 import { NewCard } from '../NewCard';
@@ -35,7 +36,8 @@ const Navbar = () => {
           {/* Logo Azogues */}
           <div className='flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6'>
             <NavLink className='flex items-center gap-2 font-semibold'>
-              <InboxStackIcon className='h-6 w-6' />
+              {/* <InboxStackIcon className='h-6 w-6' /> */}
+              <img src={log_azo} className='h-10 w-10'></img>
               <span className=''>Alcaldía Azogues</span>
             </NavLink>
 
@@ -90,12 +92,16 @@ const Navbar = () => {
                 <PresentationChartBarIcon className='h-4 w-4' />
                 Usuarios{' '}
               </NavLink>
-              <NavLink
-                to='/users/register'
-                className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'>
-                <PresentationChartBarIcon className='h-4 w-4' />
-                Registar Usuarios{' '}
-              </NavLink>
+
+              {!login.isAdmin ||
+                <NavLink
+                  to='/users/register'
+                  className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'>
+                  <PresentationChartBarIcon className='h-4 w-4' />
+                  Registar Usuarios{' '}
+                </NavLink>
+              }
+              
             </nav>
           </div>
 

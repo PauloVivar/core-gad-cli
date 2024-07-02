@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { UserContext } from '@/Context/UserContext';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -16,7 +18,7 @@ import {
 import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { UserContext } from '@/Context/UserContext';
+import { Checkbox } from '@/Components/ui/checkbox';
 
 //const existingValues = errors;
 
@@ -26,18 +28,13 @@ const userSchema = z.object({
   username: z.string().min(1, {
     message: 'El username es requerido.',
   }),
-  email: z.string().email({
-    message: 'Ingrese un email válido.',
-  }),
-  //.refine(
-  //   (value) => !existingValues.includes(value),
-  //   {
-  //     message: 'El valor debe ser único.'
-  //   }
-  // ),
   password: z.string().min(5, {
     message: 'El password debe tener al menos 5 caracteres.'
   }),
+  email: z.string().email({
+    message: 'Ingrese un email válido.',
+  }),
+  admin: z.boolean().default(false),
   // username: z.string(),
   // email: z.string(),
   // password: z.string(),
@@ -47,7 +44,8 @@ function UserForm({ userSelected, handlerCloseForm }) {
 
   //Contexto User Global
   const { initialUserForm, handlerAddUser, errors } = useContext(UserContext);
-
+  //const [isChecked, setIsChecked] = useState(userSelected.admin);
+  
   // 1. Define your form.
   const form = useForm({
     resolver: 
@@ -58,11 +56,15 @@ function UserForm({ userSelected, handlerCloseForm }) {
 
   // 2. Define a submit handler.
   const onSubmit = (userForm) => {
-    //console.log(typeof userForm);
     //console.log('user_form: ', userForm.username);
     handlerAddUser(userForm);
     form.reset();
+    //console.log('Checkbox es:', isChecked);
   }
+
+  // const onCheckboxChange = () => {
+  //   setIsChecked(!isChecked);
+  // }
 
   //3. Selecccionar rows de tabla user
   useEffect(()=>{
@@ -72,11 +74,12 @@ function UserForm({ userSelected, handlerCloseForm }) {
           ...userSelected, 
           password:'',
         };
-        //console.log('use_Effect: ',user.id);
+        console.log('use_Effect: ',user.admin);
         form.setValue('id', user.id);
         form.setValue('username', user.username);
-        form.setValue('email', user.email);
         form.setValue('password', user.password);
+        form.setValue('email', user.email);
+        form.setValue('admin', user.admin);
       }
     }
     loadUser()
@@ -108,21 +111,6 @@ function UserForm({ userSelected, handlerCloseForm }) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Ingres su email' {...field} />
-                  </FormControl>
-                  <FormMessage>
-                    {errors?.email}
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
             { userSelected.id > 0 || 
               <FormField
                 control={form.control}
@@ -141,6 +129,45 @@ function UserForm({ userSelected, handlerCloseForm }) {
                 )}
               /> 
             }
+            <FormField
+              control={form.control}
+              name='email'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder='Ingres su email' {...field} />
+                  </FormControl>
+                  <FormMessage>
+                    {errors?.email}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name='admin'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>
+                      Role Admin
+                    </FormLabel>
+                    <FormDescription>
+                      Seleccione solo si quiere que este Usuario sea Admistrador.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name='id'

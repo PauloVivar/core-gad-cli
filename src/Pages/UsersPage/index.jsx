@@ -8,6 +8,7 @@ import { UsersList } from '../../Components/UsersList';
 import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
 import { Button } from '@/Components/ui/button';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { AuthContext } from '@/Auth/Context/AuthContext';
 
 function UsersPage() {
   
@@ -19,6 +20,8 @@ function UsersPage() {
     handlerCloseForm, //ojo
     getUsers,
   } = useContext(UserContext);
+
+  const { login } = useContext(AuthContext);
 
   useEffect( ()=>{
     getUsers();
@@ -41,7 +44,8 @@ function UsersPage() {
             )}
 
             <div className='text-left'>
-              {visibleForm || <Button className='mb-2' onClick={handlerOpenForm}>Agregar Usuario</Button>}
+              {(visibleForm || !login.isAdmin) || <Button 
+                className='mb-2' onClick={handlerOpenForm}>Agregar Usuario</Button>}
               {users.length === 0 ? (
                 <Alert variant='destructive'>
                   <ExclamationCircleIcon className='size-5'/>

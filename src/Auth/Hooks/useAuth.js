@@ -2,7 +2,7 @@ import { useReducer } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { loginReducer } from '@/Auth/reducers/loginReducer';
-import { authService } from '../services/authService';
+import { loginUser } from '../services/authService';
 import Swal from 'sweetalert2';
 
 //mod email
@@ -19,16 +19,15 @@ function useAuth() {
 
   const handlerLogin = async ({ username, password }) => {
 
-    
     try {
-      const response = await authService({ username, password });
+      const response = await loginUser({ username, password });
       const token = response.data.token;
-      const claims = JSON.parse(window.atob(token.split(".")[1]));  //atob -> decodificar base64
-      console.log(claims);
+      const claims = JSON.parse(window.atob(token.split('.')[1]));  //atob -> decodificar base64
+      //console.log(claims);
 
       //3 formas de obtener el username de token:
       //1.- response.data.username  2.- claims.username  3.- claims.sub (del payload de jwt)
-      const user = { username: claims.username };
+      const user = { username: claims.sub };
       //const user = { username: 'admin' };
 
       dispatch({

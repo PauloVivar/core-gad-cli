@@ -2,9 +2,9 @@ import axios from 'axios';
 
 //viene de useAuth
 //mod email
-const authService = async ({ username, password }) => {
+const loginUser = async ({ username, password }) => {
   try {
-    return await axios.post('http://localhost:8080/api/v1/login', {
+    return await axios.post('http://localhost:8080/login', {
       username,
       password,
     });
@@ -14,4 +14,4 @@ const authService = async ({ username, password }) => {
   //return userLogin.username === 'admin' && userLogin.password === '12345' ? true : false;
 };
 
-export { authService };
+export { loginUser };

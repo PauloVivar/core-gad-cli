@@ -2,16 +2,19 @@ import PropTypes from 'prop-types';
 
 import { useContext } from 'react';
 import { UserContext } from '@/Context/UserContext';
+import { AuthContext } from '@/Auth/Context/AuthContext';
 import { NavLink } from 'react-router-dom';
 
+//components
 import { TableCell, TableRow } from '@/Components/ui/table';
 
 //icons
 import { ArrowPathIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 
-const UserRow = ({ id, username, email }) => {
+const UserRow = ({ id, username, email, admin }) => {
 
   const {handlerDeleteUser, handlerSelectedUserForm} = useContext(UserContext);
+  const { login } = useContext(AuthContext);
   
   return (
     <TableRow >
@@ -19,21 +22,24 @@ const UserRow = ({ id, username, email }) => {
       <TableCell>{username}</TableCell>
       <TableCell>{email}</TableCell>
 
-      <TableCell className='flex flex-row gap-2'>
-        <button onClick={()=> handlerSelectedUserForm({
-          id,
-          username,
-          email,
-        })}>
-          <ArrowPathIcon className='size-5 text-zinc-500 hover:cursor-pointer' />
-        </button>
-        <NavLink to={'/users/edit/' + id}>
-          <PencilSquareIcon className='size-5 text-zinc-500 hover:cursor-pointer' />
-        </NavLink>
-        <button onClick={()=> handlerDeleteUser(id)}>
-          <TrashIcon className='size-5 text-red-500 hover:cursor-pointer' />
-        </button>
-      </TableCell>
+      {!login.isAdmin ||
+        <TableCell className='flex flex-row gap-2'>
+          <button onClick={()=> handlerSelectedUserForm({
+            id,
+            username,
+            email,
+            admin,
+          })}>
+            <ArrowPathIcon className='size-5 text-zinc-500 hover:cursor-pointer' />
+          </button>
+          <NavLink to={'/users/edit/' + id}>
+            <PencilSquareIcon className='size-5 text-zinc-500 hover:cursor-pointer' />
+          </NavLink>
+          <button onClick={()=> handlerDeleteUser(id)}>
+            <TrashIcon className='size-5 text-red-500 hover:cursor-pointer' />
+          </button>
+        </TableCell>
+      }
       
     </TableRow>
   );
