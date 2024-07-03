@@ -1,9 +1,7 @@
 import PropTypes from 'prop-types';
-
-import { useContext } from 'react';
-import { UserContext } from '@/context/UserContext';
-import { AuthContext } from '@/auth/context/AuthContext';
 import { NavLink } from 'react-router-dom';
+import { useUsers } from '@/hooks/useUsers';
+import { useAuth } from '@/auth/hooks/useAuth';
 
 //components
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -13,8 +11,8 @@ import { ArrowPathIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/
 
 const UserRow = ({ id, username, email, admin }) => {
 
-  const {handlerDeleteUser, handlerSelectedUserForm} = useContext(UserContext);
-  const { login } = useContext(AuthContext);
+  const { handlerDeleteUser, handlerSelectedUserForm } = useUsers();
+  const { login } = useAuth();
   
   return (
     <TableRow >

@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { UserContext } from '@/context/UserContext';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,6 +18,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useUsers } from '@/hooks/useUsers';
 
 //const existingValues = errors;
 
@@ -42,9 +42,8 @@ const userSchema = z.object({
 
 function UserForm({ userSelected, handlerCloseForm }) {
 
-  //Contexto User Global
-  const { initialUserForm, handlerAddUser, errors } = useContext(UserContext);
-  //const [isChecked, setIsChecked] = useState(userSelected.admin);
+  //Context useUsers Global Redux
+  const { initialUserForm, handlerAddUser, errors } = useUsers();
   
   // 1. Define your form.
   const form = useForm({

@@ -1,14 +1,15 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Layout } from '../../components/Layout';
 import { UserForm } from '../../components/UserForm';
-import { UserContext } from '@/context/UserContext';
+import { useUsers } from '@/hooks/useUsers';
 
 
 function RegisterPage() {
 
-  const { users=[], initialUserForm } = useContext(UserContext);
+  //useUsers hook(Redux) se reemplaza por useContext
+  const { users=[], initialUserForm } = useUsers();
 
   const [userSelected, setUserSelected] = useState(initialUserForm);
 

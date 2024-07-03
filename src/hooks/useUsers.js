@@ -1,14 +1,20 @@
-import { useContext, useReducer, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { usersReducer } from '../reducers/usersReducer';
-import { AuthContext } from '@/auth/context/AuthContext';
+import { useAuth } from '@/auth/hooks/useAuth';
 import { findAll, remove, save, update } from '@/services/useService';
 
 import Swal from 'sweetalert2';
-
-//import { userSchema } from '../components/UserForm';
-//import { z } from 'zod';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  initialUserForm,
+  addUser, 
+  removeUser, 
+  updateUser, 
+  loadingUsers, 
+  onSelectedUserForm,
+  onOpenForm,
+  onCloseForm,
+  loadingError,
+} from '@/store/slices/users/usersSlice';
 
 const initialUsers = [
   // {
@@ -19,48 +25,25 @@ const initialUsers = [
   // },
 ];
 
-//Se inicialeza id=0 para seleccionar y update.
-const initialUserForm = {
-  id: 0,
-  username: '',
-  email: '',
-  password: '',
-  admin: false,
-};
-
-const initialErrors = {
-  username: '',
-  email: '',
-  password: '',
-};
-
 const useUsers = () => {
+
+  const { handlerLogout } = useAuth();
   //Reducer para CRUD en el Frond
-  const [users, dispatch] = useReducer(usersReducer, initialUsers);
-
-  //Estado para selecionar row de tabla usuarios para update
-  const [userSelected, setUserSelected] = useState(initialUserForm);
-
-  //Estado para ocultar formulario
-  const [visibleForm, setVisibleForm] = useState(false);
-
-  //Estado para guardar errores conf en el backend
-  const [errors, setErrors] = useState(initialErrors);
+  //const [users, dispatch] = useReducer(usersReducer, initialUsers);
+  //Redux para CRUD en el Frond
+  const { users } = useSelector(state => state.users);
+  const dispatch = useDispatch();
 
   //Navigate para redirigir a UsersPage
   const navigate = useNavigate();
-
-  const { handlerLogout } = useContext(AuthContext);
 
   //Jalar la data de la API BACKEND con SPRING BOOT
   const getUsers = async () => {
     try {
       const result = await findAll();
       //console.log(result);
-      dispatch({
-        type: 'loadingUsers',
-        payload: result.data,
-      });
+      dispatch(loadingUsers(result.data));
+
     } catch (error) {
       if(error.response.status == 401) {
         handlerLogout();
@@ -74,15 +57,11 @@ const useUsers = () => {
       //userSchema.parse(user);
       if (user.id === 0) {
         response = await save(user);
+        dispatch(addUser(response.data));
       } else {
         response = await update(user);
+        dispatch(updateUser(response.data));
       }
-
-      dispatch({
-        type: user.id === 0 ? 'addUser' : 'updateUser',
-        payload: response.data,
-        //payload: user,
-      });
 
       user.id === 0
         ? Swal.fire({
@@ -102,24 +81,19 @@ const useUsers = () => {
       navigate('/users');
     } catch (error) {
 
-      // if (error instanceof z.ZodError) {
-      //   console.error('test2', error.errors);
-      //   setErrors(error.response.data);
-      // }
-      //2da forma
       if (error.response && error.response.status == 400) {
         //console.error('prueba',error.response.data);
-        setErrors(error.response.data);
+        dispatch(loadingError(error.response.data));
       } else if (error.response && error.response.status == 500 &&
         error.response.data?.message?.includes('constraint')) {
 
           if(error.response.data?.message?.includes('users_username_key')){
             //console.log({username: 'El username ya existe'});
-            setErrors({username: 'El username ya existe'});
+            dispatch(loadingError({username: 'El username ya existe'}));
           }
           if(error.response.data?.message?.includes('users_email_key')){
             //console.log({username: 'El email ya existe'});
-            setErrors({email: 'El email ya existe'});
+            dispatch(loadingError({email: 'El email ya existe'}));
           }
       } else if(error.response.status == 401) {
         handlerLogout();
@@ -145,13 +119,16 @@ const useUsers = () => {
       if (result.isConfirmed) {
 
         try {
-           /* eliminar de la db */
+          // eliminar de la db -> Lógica para eliminar
           await remove(id);
-          /* Lógica para eliminar */
-          dispatch({
-            type: 'removeUser',
-            payload: id,
-          });
+          dispatch(removeUser(id));
+
+          //antes con reducer
+          // dispatch({
+          //   type: 'removeUser',
+          //   payload: id,
+          // });
+          
           Swal.fire({
             title: 'Eliminado!',
             text: 'Usuario ha sido eliminado.',
@@ -170,17 +147,16 @@ const useUsers = () => {
   const handlerSelectedUserForm = (user) => {
     //console.log(user);
     //Se muestra form al seleccionar
-    handlerOpenForm();
-    setUserSelected({ ...user });
+    dispatch(onSelectedUserForm(user));
   };
 
   const handlerOpenForm = () => {
-    setVisibleForm(true);
+    dispatch(onOpenForm());
   };
 
   const handlerCloseForm = () => {
-    setVisibleForm(false);
-    setUserSelected(initialUserForm);
+    dispatch(onCloseForm());
+    dispatch(loadingError({}));
   };
 
   return {

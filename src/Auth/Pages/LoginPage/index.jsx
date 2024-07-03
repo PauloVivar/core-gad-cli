@@ -1,4 +1,6 @@
 import { useForm } from 'react-hook-form';
+import { useAuth } from '@/auth/hooks/useAuth';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -22,8 +24,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useContext } from 'react';
-import { AuthContext } from '@/auth/context/AuthContext';
 
 //mod email
 //Validation Schema
@@ -45,7 +45,7 @@ const initialLoginForm = {
 
 function LoginPage() {
 
-  const { handlerLogin } = useContext(AuthContext);
+  const { handlerLogin } = useAuth();
   
   // 1. Define your form.
   const form = useForm({

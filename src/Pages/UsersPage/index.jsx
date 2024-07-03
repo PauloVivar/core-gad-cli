@@ -1,5 +1,6 @@
-import { useContext, useEffect } from 'react';
-import { UserContext } from '@/context/UserContext';
+import { useEffect } from 'react';
+import { useUsers } from '@/hooks/useUsers';
+import { useAuth } from '@/auth/hooks/useAuth';
 
 import { Layout } from '../../components/Layout';
 import { UserForm } from '../../components/UserForm';
@@ -8,7 +9,8 @@ import { UsersList } from '../../components/UsersList';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
-import { AuthContext } from '@/auth/context/AuthContext';
+
+
 
 function UsersPage() {
   
@@ -19,9 +21,9 @@ function UsersPage() {
     handlerOpenForm,
     handlerCloseForm, //ojo
     getUsers,
-  } = useContext(UserContext);
+  } = useUsers();
 
-  const { login } = useContext(AuthContext);
+  const { login } = useAuth();
 
   useEffect( ()=>{
     getUsers();

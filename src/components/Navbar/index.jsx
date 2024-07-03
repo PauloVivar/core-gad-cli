@@ -1,6 +1,5 @@
-import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { AuthContext } from '@/auth/context/AuthContext';
+import { useAuth } from '@/auth/hooks/useAuth';
 
 //Icons
 import {
@@ -24,9 +23,10 @@ import { NewCard } from '../NewCard';
 import { SearchInput } from './SearchInput';
 import { UserMenu } from './UserMenu';
 
+
 const Navbar = () => {
 
-  const { login, handlerLogout } = useContext(AuthContext);
+  const { login, handlerLogout } = useAuth();
 
   return (
     <div className='grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>

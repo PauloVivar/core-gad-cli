@@ -1,3 +1,5 @@
+import { useUsers } from '@/hooks/useUsers';
+import { useAuth } from '@/auth/hooks/useAuth';
 
 import {
   Table,
@@ -10,14 +12,11 @@ import {
 
 import { Card } from '@/components/ui/card';
 import { UserRow } from './UserRow';
-import { useContext } from 'react';
-import { UserContext } from '@/context/UserContext';
-import { AuthContext } from '@/auth/context/AuthContext';
 
 const UsersList = () => {
 
-  const { users } = useContext(UserContext);
-  const { login } = useContext(AuthContext);
+  const { users } = useUsers();
+  const { login } = useAuth();
 
   return (
     <>
