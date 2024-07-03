@@ -6,13 +6,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/Components/ui/table';
+} from '@/components/ui/table';
 
-import { Card } from '@/Components/ui/card';
+import { Card } from '@/components/ui/card';
 import { UserRow } from './UserRow';
 import { useContext } from 'react';
-import { UserContext } from '@/Context/UserContext';
-import { AuthContext } from '@/Auth/Context/AuthContext';
+import { UserContext } from '@/context/UserContext';
+import { AuthContext } from '@/auth/context/AuthContext';
 
 const UsersList = () => {
 

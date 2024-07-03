@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Layout } from '../../Components/Layout';
-import { UserForm } from '../../Components/UserForm';
-import { UserContext } from '@/Context/UserContext';
+import { Layout } from '../../components/Layout';
+import { UserForm } from '../../components/UserForm';
+import { UserContext } from '@/context/UserContext';
 
 
 function RegisterPage() {

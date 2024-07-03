@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 
 import { useContext } from 'react';
-import { UserContext } from '@/Context/UserContext';
-import { AuthContext } from '@/Auth/Context/AuthContext';
+import { UserContext } from '@/context/UserContext';
+import { AuthContext } from '@/auth/context/AuthContext';
 import { NavLink } from 'react-router-dom';
 
 //components
-import { TableCell, TableRow } from '@/Components/ui/table';
+import { TableCell, TableRow } from '@/components/ui/table';
 
 //icons
 import { ArrowPathIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
@@ -49,6 +49,7 @@ UserRow.propTypes = {
   id: PropTypes.number.isRequired,
   username: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
+  admin: PropTypes.bool.isRequired,
 }
 
 export { UserRow };

@@ -2,12 +2,12 @@ import { useContext, useReducer, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { usersReducer } from '../reducers/usersReducer';
-import { AuthContext } from '@/Auth/Context/AuthContext';
+import { AuthContext } from '@/auth/context/AuthContext';
 import { findAll, remove, save, update } from '@/services/useService';
 
 import Swal from 'sweetalert2';
 
-//import { userSchema } from '../Components/UserForm';
+//import { userSchema } from '../components/UserForm';
 //import { z } from 'zod';
 
 const initialUsers = [
@@ -54,12 +54,18 @@ const useUsers = () => {
 
   //Jalar la data de la API BACKEND con SPRING BOOT
   const getUsers = async () => {
-    const result = await findAll();
-    //console.log(result);
-    dispatch({
-      type: 'loadingUsers',
-      payload: result.data,
-    });
+    try {
+      const result = await findAll();
+      //console.log(result);
+      dispatch({
+        type: 'loadingUsers',
+        payload: result.data,
+      });
+    } catch (error) {
+      if(error.response.status == 401) {
+        handlerLogout();
+      }
+    }
   };
 
   const handlerAddUser = async (user) => {
@@ -97,10 +103,9 @@ const useUsers = () => {
     } catch (error) {
 
       // if (error instanceof z.ZodError) {
-      //console.error('test2', error.errors);
+      //   console.error('test2', error.errors);
       //   setErrors(error.response.data);
       // }
-
       //2da forma
       if (error.response && error.response.status == 400) {
         //console.error('prueba',error.response.data);
@@ -118,7 +123,7 @@ const useUsers = () => {
           }
       } else if(error.response.status == 401) {
         handlerLogout();
-
+        
       } else {
           throw error;
       }

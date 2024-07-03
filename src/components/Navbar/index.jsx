@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { AuthContext } from '@/Auth/Context/AuthContext';
+import { AuthContext } from '@/auth/context/AuthContext';
 
 //Icons
 import {
@@ -14,12 +14,12 @@ import {
   InboxIcon,
 } from '@heroicons/react/24/solid';
 
-import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
-import { Button } from '@/Components/ui/button';
-import { Badge } from '@/Components/ui/badge';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import log_azo from '../../assets/log_azo.jpg';
 
-//Components
+//components
 import { NewCard } from '../NewCard';
 import { SearchInput } from './SearchInput';
 import { UserMenu } from './UserMenu';

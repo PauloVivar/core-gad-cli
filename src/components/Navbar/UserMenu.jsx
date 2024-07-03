@@ -5,9 +5,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
-import { Button } from '@/Components/ui/button';
-import { Label } from "@/Components/ui/label"
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Label } from "@/components/ui/label"
 
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
@@ -16,7 +16,7 @@ import { UserCircleIcon } from '@heroicons/react/24/solid';
 function UserMenu({ login, handlerLogout }) {
   return (
     <>
-      <Label htmlFor='username' className='text-zinc-500 text-sm'>{login.user?.username}</Label>
+      <Label className='text-zinc-500 text-sm'>{login.user?.username}</Label>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           

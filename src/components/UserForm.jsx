@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { UserContext } from '@/Context/UserContext';
+import { UserContext } from '@/context/UserContext';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,11 +14,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/Components/ui/form';
-import { Card } from '@/Components/ui/card';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Checkbox } from '@/Components/ui/checkbox';
+} from '@/components/ui/form';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
 //const existingValues = errors;
 
@@ -34,7 +34,7 @@ const userSchema = z.object({
   email: z.string().email({
     message: 'Ingrese un email válido.',
   }),
-  admin: z.boolean().default(false),
+  admin: z.boolean().default(false).optional(),
   // username: z.string(),
   // email: z.string(),
   // password: z.string(),
@@ -56,15 +56,10 @@ function UserForm({ userSelected, handlerCloseForm }) {
 
   // 2. Define a submit handler.
   const onSubmit = (userForm) => {
-    //console.log('user_form: ', userForm.username);
+    console.log('user_form: ', userForm);
     handlerAddUser(userForm);
     form.reset();
-    //console.log('Checkbox es:', isChecked);
   }
-
-  // const onCheckboxChange = () => {
-  //   setIsChecked(!isChecked);
-  // }
 
   //3. Selecccionar rows de tabla user
   useEffect(()=>{
@@ -74,7 +69,7 @@ function UserForm({ userSelected, handlerCloseForm }) {
           ...userSelected, 
           password:'',
         };
-        console.log('use_Effect: ',user.admin);
+        //console.log('use_Effect: ',user.admin);
         form.setValue('id', user.id);
         form.setValue('username', user.username);
         form.setValue('password', user.password);
@@ -161,7 +156,7 @@ function UserForm({ userSelected, handlerCloseForm }) {
                       Role Admin
                     </FormLabel>
                     <FormDescription>
-                      Seleccione solo si quiere que este Usuario sea Admistrador.
+                      Seleccione para un Usuario Admistrador.
                     </FormDescription>
                   </div>
                 </FormItem>

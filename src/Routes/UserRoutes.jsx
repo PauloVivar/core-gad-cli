@@ -1,13 +1,13 @@
 
 import { useContext } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { UserProvider } from '../Context/UserProvider';
-import { AuthContext } from '@/Auth/Context/AuthContext';
+import { UserProvider } from '../context/UserProvider';
+import { AuthContext } from '@/auth/context/AuthContext';
 
-import { Navbar } from '../Components/Navbar';
+import { Navbar } from '../components/Navbar';
 
-import { RegisterPage } from '../Pages/RegisterPage';
-import { UsersPage } from '../Pages/UsersPage';
+import { RegisterPage } from '../pages/RegisterPage';
+import { UsersPage } from '../pages/UsersPage';
 
 function UserRoutes() {
 

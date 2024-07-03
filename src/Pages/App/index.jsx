@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import { AuthContext } from '../../Auth/Context/AuthContext';
-import { LoginPage } from '../../Auth/Pages/LoginPage';
-import { UserRoutes } from '../../Routes/UserRoutes';
+import { AuthContext } from '../../auth/context/AuthContext';
+import { LoginPage } from '../../auth/pages/LoginPage';
+import { UserRoutes } from '../../routes/UserRoutes';
 
 import './App.css';
 

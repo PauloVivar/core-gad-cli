@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { loginReducer } from '@/Auth/reducers/loginReducer';
+import { loginReducer } from '@/auth/reducers/loginReducer';
 import { loginUser } from '../services/authService';
 import Swal from 'sweetalert2';
 
