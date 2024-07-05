@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useUsers } from '@/hooks/useUsers';
 import { useAuth } from '@/auth/hooks/useAuth';
 
@@ -8,16 +9,19 @@ import { UsersList } from '../../components/UsersList';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
-
-
 
 function UsersPage() {
   
+  //paginación
+  const { page } = useParams();
   const {
     users,
     userSelected, //ojo
     visibleForm,
+    isLoading,
     handlerOpenForm,
     handlerCloseForm, //ojo
     getUsers,
@@ -26,8 +30,23 @@ function UsersPage() {
   const { login } = useAuth();
 
   useEffect( ()=>{
-    getUsers();
-  }, []);
+    getUsers(page);
+  }, [ , page]);
+
+  if(isLoading){
+    return(
+      <div className='w-[95%] absolute mt-40 top-14 flex flex-col space-y-3 justify-center items-center text-center text-slate-500 
+        lg:w-[75%] lg:left-72'>
+        <Skeleton className='h-[100px] w-[400px] rounded-xl bg-slate-200' />
+        <div className='space-y-2'>
+          <Skeleton className='h-4 w-[400px] bg-slate-200' />
+          <Skeleton className='h-4 w-[400px] bg-slate-200' />
+          <Skeleton className='h-4 w-[400px] bg-slate-200' />
+          <p className='mt-4'>Cargando datos...</p>
+        </div>
+      </div>
+    )
+  };
 
   return (
     <Layout>

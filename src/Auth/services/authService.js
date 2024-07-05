@@ -4,7 +4,7 @@ import axios from 'axios';
 //mod email
 const loginUser = async ({ username, password }) => {
   try {
-    return await axios.post('http://localhost:8080/login', {
+    return await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, {
       username,
       password,
     });

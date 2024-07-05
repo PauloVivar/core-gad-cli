@@ -1,51 +1,50 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/hooks/useAuth';
-import { findAll, remove, save, update } from '@/services/useService';
+import { findAllPages, remove, save, update } from '@/services/useService';
 
 import Swal from 'sweetalert2';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   initialUserForm,
-  addUser, 
-  removeUser, 
-  updateUser, 
-  loadingUsers, 
+  addUser,
+  removeUser,
+  updateUser,
+  loadingUsers,
   onSelectedUserForm,
   onOpenForm,
   onCloseForm,
   loadingError,
 } from '@/store/slices/users/usersSlice';
 
-const initialUsers = [
-  // {
-  //   id: 1,
-  //   username: 'Juan',
-  //   email: 'juan.test@mail.com',
-  //   password: '@dfgdgdffdghf@',
-  // },
-];
+// const initialUsers = [
+//   // {
+//   //   id: 1,
+//   //   username: 'Juan',
+//   //   email: 'juan.test@mail.com',
+//   //   password: '@dfgdgdffdghf@',
+//   // },
+// ];
 
 const useUsers = () => {
-
   const { handlerLogout } = useAuth();
   //Reducer para CRUD en el Frond
   //const [users, dispatch] = useReducer(usersReducer, initialUsers);
+  
   //Redux para CRUD en el Frond
-  const { users } = useSelector(state => state.users);
+  const { users, paginator, userSelected, visibleForm, errors, isLoading } = useSelector((state) => state.users);
   const dispatch = useDispatch();
 
   //Navigate para redirigir a UsersPage
   const navigate = useNavigate();
 
   //Jalar la data de la API BACKEND con SPRING BOOT
-  const getUsers = async () => {
+  const getUsers = async (page = 0) => {
     try {
-      const result = await findAll();
+      const result = await findAllPages(page);
       //console.log(result);
       dispatch(loadingUsers(result.data));
-
     } catch (error) {
-      if(error.response.status == 401) {
+      if (error.response?.status == 401) {
         handlerLogout();
       }
     }
@@ -61,7 +60,7 @@ const useUsers = () => {
       } else {
         response = await update(user);
         dispatch(updateUser(response.data));
-      }
+      };
 
       user.id === 0
         ? Swal.fire({
@@ -80,29 +79,33 @@ const useUsers = () => {
       //Redirigir a UsersPage
       navigate('/users');
     } catch (error) {
-
       if (error.response && error.response.status == 400) {
-        //console.error('prueba',error.response.data);
+        //console.error('solicitud_incorrecta:',error.response.data);
         dispatch(loadingError(error.response.data));
-      } else if (error.response && error.response.status == 500 &&
-        error.response.data?.message?.includes('constraint')) {
-
-          if(error.response.data?.message?.includes('users_username_key')){
-            //console.log({username: 'El username ya existe'});
-            dispatch(loadingError({username: 'El username ya existe'}));
+      } else if (
+        //500 -> error de server || 403 -> prohibido
+        error.response &&
+        error.response.status == 403 &&
+        error.response.data?.message?.includes('constraint')
+        ) {
+          if (error.response.data?.message?.includes('users_username_key')) {
+            console.log({username: 'El username ya existe'});
+            dispatch(loadingError({ username: 'El username ya existe' }));
           }
-          if(error.response.data?.message?.includes('users_email_key')){
-            //console.log({username: 'El email ya existe'});
-            dispatch(loadingError({email: 'El email ya existe'}));
+          if (error.response.data?.message?.includes('users_email_key')) {
+            console.log({email: 'El email ya existe'});
+            dispatch(loadingError({ email: 'El email ya existe' }));
           }
-      } else if(error.response.status == 401) {
+      } else if (error.response?.status == 401) {
+        //console.error('no_autorizado:',error.response.data);
         handlerLogout();
-        
+
       } else {
-          throw error;
+        console.log("pruebas pv")
+        throw error;
       }
     }
-  };
+  }
 
   const handlerDeleteUser = (id) => {
     //console.log(id);
@@ -115,9 +118,8 @@ const useUsers = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Si, bórralo!',
-    }).then( async(result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-
         try {
           // eliminar de la db -> Lógica para eliminar
           await remove(id);
@@ -128,15 +130,14 @@ const useUsers = () => {
           //   type: 'removeUser',
           //   payload: id,
           // });
-          
+
           Swal.fire({
             title: 'Eliminado!',
             text: 'Usuario ha sido eliminado.',
             icon: 'success',
           });
-
         } catch (error) {
-          if(error.response.status == 401) {
+          if (error.response?.status == 401) {
             handlerLogout();
           }
         }
@@ -147,7 +148,7 @@ const useUsers = () => {
   const handlerSelectedUserForm = (user) => {
     //console.log(user);
     //Se muestra form al seleccionar
-    dispatch(onSelectedUserForm(user));
+    dispatch(onSelectedUserForm({ ...user }));
   };
 
   const handlerOpenForm = () => {
@@ -156,15 +157,17 @@ const useUsers = () => {
 
   const handlerCloseForm = () => {
     dispatch(onCloseForm());
-    dispatch(loadingError({}));
+    //dispatch(loadingError({}));
   };
 
   return {
     users,
+    paginator,
     userSelected,
     initialUserForm,
     visibleForm,
     errors,
+    isLoading,
     handlerAddUser,
     handlerDeleteUser,
     handlerSelectedUserForm,

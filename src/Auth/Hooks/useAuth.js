@@ -1,19 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../services/authService';
-import { onLogin, onLogout } from '@/store/slices/auth/authSlice';
+import { onLogin, onLogout, onInitLoading } from '@/store/slices/auth/authSlice';
 import Swal from 'sweetalert2';
 
 function useAuth() {
   //const [login, dispatch] = useReducer(loginReducer, initialLogin);
   const dispatch = useDispatch();
-  const { user, isAdmin, isAuth } = useSelector(state => state.auth);
+  const { user, isAdmin, isAuth, isLoginLoading } = useSelector(state => state.auth);
 
   const navigate = useNavigate();
 
   const handlerLogin = async ({ username, password }) => {
 
     try {
+      dispatch(onInitLoading());
       const response = await loginUser({ username, password });
       const token = response.data.token;
       const claims = JSON.parse(window.atob(token.split('.')[1]));  //atob -> decodificar base64
@@ -37,6 +38,7 @@ function useAuth() {
       navigate('/users');
 
     } catch(error) {
+      dispatch(onLogout());
       if(error.response?.status == 401){
         Swal.fire({
           icon: 'error',
@@ -67,6 +69,7 @@ function useAuth() {
       user,
       isAdmin,
       isAuth,
+      isLoginLoading,
     },
     handlerLogin,
     handlerLogout,

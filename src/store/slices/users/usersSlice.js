@@ -19,9 +19,11 @@ export const usersSlice = createSlice ({
   name: 'users',
   initialState: {
     users: [],
+    paginator: {},                            //paginacion
     userSelected: initialUserForm,            //selecionar row de tabla usuarios para update
     visibleForm: false,                       //ocultar formulario
     errors: initialErrors,                    //guardar errores config en el backend
+    isLoading: true,                          //espera hasta que carga la grilla(tabla)
   },
   reducers: {
     addUser: (state, action) => {
@@ -32,7 +34,7 @@ export const usersSlice = createSlice ({
         }
       ];
       state.userSelected= initialUserForm;
-      visibleForm= false;
+      state.visibleForm= false;
     },
     removeUser: (state, action) => {
       state.users = state.users.filter(user => user.id !== action.payload);
@@ -48,10 +50,12 @@ export const usersSlice = createSlice ({
         return user;
       });
       state.userSelected= initialUserForm;
-      visibleForm= false;
+      state.visibleForm= false;
     },
     loadingUsers: (state, action) => {
+      state.users = action.payload.content;
       state.users = action.payload;
+      state.isLoading = false;
     },
     onSelectedUserForm: (state, action) => {
       state.userSelected = action.payload;

@@ -11,7 +11,17 @@ const findAll = async () => {
     console.error(error);
     throw error;
   }
-};
+}
+
+const findAllPages = async (page = 0) => {
+  try {
+    const response = await usersApi.get(`${BASE_URL}/page/${page}`);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
 const save = async ({ username, email, password, admin }) =>{
   try {
@@ -47,4 +57,4 @@ const remove = async (id) => {
   }
 }
 
-export { findAll, save, update, remove };
+export { findAll, findAllPages, save, update, remove };
