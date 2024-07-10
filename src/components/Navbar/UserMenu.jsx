@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Label } from "@/components/ui/label"
+import { Label } from '@/components/ui/label';
 
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
@@ -36,8 +37,10 @@ function UserMenu({ login, handlerLogout }) {
           <DropdownMenuItem>Soporte</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
-            <Button onClick={handlerLogout} variant='destructive' className='w-full h-7'>
-              Logout
+            <Button asChild onClick={handlerLogout} variant='destructive' className='w-full h-7'>
+              <NavLink to='/'>
+                Logout
+              </NavLink>
             </Button>
           </DropdownMenuItem>
         </DropdownMenuContent>

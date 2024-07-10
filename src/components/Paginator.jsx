@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -9,48 +9,70 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 
-const Paginator = () => {
-  const { paginator } = useSelector((state) => state.users);
+import { ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/react/24/outline';
+
+const Paginator = ({ url, paginator }) => {
+  const [activePage, setActivePage] = useState(paginator.number);
+
+  const handleClick = (page) => {
+    setActivePage(page);
+  };
 
   return (
-    <>
-      {paginator?.length === 0 || (
-        <Pagination>
-          <PaginationContent>
-            {paginator.number == 0 ||
-              <>
-                <PaginationItem>
-                  <PaginationPrevious href='#' to={`/users/page/${paginator.number - 1}`} />
-                </PaginationItem>  
-              </>
-            }
+    <Pagination className='mt-2 justify-start'>
+      {paginator?.length == 1 || (
+        <PaginationContent>
+          {paginator.number == 0 ||
             <PaginationItem>
-                <PaginationLink href='#'>1</PaginationLink>
+              <PaginationPrevious 
+                href={`${url}/${paginator.number - 1}`}
+                isActive />
             </PaginationItem>
+          }
 
+          <PaginationItem >
+            <PaginationLink 
+              href={`${url}/0`}
+              isActive={activePage == 0}
+              onClick={() => handleClick(0)}
+              className={paginator.first ? 'disabled' : ''} >
+                <ChevronDoubleLeftIcon className='size-4' />
+              </PaginationLink>
+          </PaginationItem>
+
+          <PaginationItem>
+            <PaginationLink href='#' >
+              {paginator.number + 1}
+            </PaginationLink>
+          </PaginationItem>
+
+          {paginator.number >= paginator.totalPages - 1 ||
             <PaginationItem>
-              <PaginationLink href='#' isActive>2</PaginationLink>
+              <PaginationEllipsis />
             </PaginationItem>
+          }
 
-            <PaginationItem>
-              <PaginationLink href='#'>3</PaginationLink>
-            </PaginationItem>
-            
-            {paginator.number >= paginator.totalPage -1 ||
-              <>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href='#' to={`/users/page/${paginator.number + 1}`} />
-                </PaginationItem>
-              </>
-            }
+          <PaginationItem>
+            <PaginationLink 
+              href={`${url}/${paginator.totalPages - 1}`}
+              isActive={activePage == paginator.totalPages - 1}
+              onClick={() => handleClick(paginator.totalPages - 1)}
+              className={paginator.last ? 'disabled' : ''} >
+                <ChevronDoubleRightIcon className='size-4' />
+              </PaginationLink>
+          </PaginationItem>
 
-          </PaginationContent>
-        </Pagination>
+          {paginator.number >= paginator.totalPages - 1 ||
+              <PaginationItem>
+                <PaginationNext 
+                  href={`${url}/${paginator.number + 1}`} 
+                  isActive />
+              </PaginationItem>
+          }
+
+        </PaginationContent>
       )}
-    </>
+    </Pagination>
   );
 };
 

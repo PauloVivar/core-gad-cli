@@ -20,8 +20,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-//const existingValues = errors;
-
 //Validation Schema
 const userSchema = z.object({
   id: z.number(),
@@ -42,7 +40,7 @@ const userSchema = z.object({
 
 function UserForm({ userSelected, handlerCloseForm }) {
 
-  //Context useUsers Global Redux
+  //Context useUsers Global Redux.
   const { initialUserForm, handlerAddUser, errors } = useUsers();
   
   // 1. Define your form.
@@ -54,13 +52,13 @@ function UserForm({ userSelected, handlerCloseForm }) {
   });
 
   // 2. Define a submit handler.
-  const onSubmit = (userForm) => {
-    console.log('user_form: ', userForm);
-    handlerAddUser(userForm);
+  const onSubmit = (data) => {
+    console.log('data: ', data);
+    handlerAddUser(data);
     form.reset();
   }
 
-  //3. Selecccionar rows de tabla user
+  //3. Selecccionar rows de tabla user.
   useEffect(()=>{
     async function loadUser(){
       if (userSelected){
@@ -85,7 +83,6 @@ function UserForm({ userSelected, handlerCloseForm }) {
   }
 
   return (
-    <>
     <div className='flex flex-col w-full'>
       <Card className='w-[400px] p-6'>
         <Form className='flex flex-col gap-4' {...form}>
@@ -155,7 +152,7 @@ function UserForm({ userSelected, handlerCloseForm }) {
                       Role Admin
                     </FormLabel>
                     <FormDescription>
-                      Seleccione para un Usuario Admistrador.
+                      Seleccionar para que sea Usuario Admistrador.
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -192,7 +189,6 @@ function UserForm({ userSelected, handlerCloseForm }) {
         </Form>
       </Card>
     </div>
-    </>
   );
 }
 

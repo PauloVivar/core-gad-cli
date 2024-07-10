@@ -6,12 +6,14 @@ import { useAuth } from '@/auth/hooks/useAuth';
 import { Layout } from '../../components/Layout';
 import { UserForm } from '../../components/UserForm';
 import { UsersList } from '../../components/UsersList';
+import { Paginator } from '../../components/Paginator';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+
 
 function UsersPage() {
   
@@ -22,6 +24,7 @@ function UsersPage() {
     userSelected, //ojo
     visibleForm,
     isLoading,
+    paginator,
     handlerOpenForm,
     handlerCloseForm, //ojo
     getUsers,
@@ -31,7 +34,7 @@ function UsersPage() {
 
   useEffect( ()=>{
     getUsers(page);
-  }, [ , page]);
+  }, [, page]);
 
   if(isLoading){
     return(
@@ -53,10 +56,10 @@ function UsersPage() {
       <div className='flex items-center'>
         <h1 className='text-lg font-semibold md:text-2xl'>Usuarios</h1>
       </div>
-      <div className='flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm p-4'>
+      <div className='w-full h-full flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm p-2'>
         <div className='flex flex-col items-center gap-1'>
 
-          <div className='w-[95%] h-full m-4 flex flex-row justify-center gap-4'>
+          <div className='w-full h-full p-2 m-2 flex flex-row justify-center gap-4'>
             {!visibleForm || (
               <UserForm
                 userSelected={userSelected}
@@ -69,14 +72,17 @@ function UsersPage() {
                 className='mb-2' onClick={handlerOpenForm}>Agregar Usuario</Button>}
               {users.length === 0 ? (
                 <Alert variant='destructive'>
-                  <ExclamationCircleIcon className='size-5'/>
+                  <ExclamationCircleIcon className='size-5 text-red-500'/>
                   <AlertTitle>Atención</AlertTitle>
                   <AlertDescription>
                     No hay usuarios en el sistema, por favor crear un nuevo registro.
                   </AlertDescription>
                 </Alert>
               ) : (
-                <UsersList />
+                <>
+                  <UsersList />
+                  <Paginator url='/users/page' paginator={paginator} />
+                </>
               )}
             </div>
           </div>

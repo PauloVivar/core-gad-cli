@@ -1,12 +1,10 @@
 
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '@/auth/hooks/useAuth';
-
-import { Navbar } from '../components/Navbar';
-
-import { RegisterPage } from '../pages/RegisterPage';
+//import { Navbar } from '../components/Navbar';
+import { SelectRegisterPage } from '../pages/SelectRegisterPage';
 import { UsersPage } from '../pages/UsersPage';
-
+import { Home } from '@/pages/Home';
 
 function UserRoutes() {
 
@@ -14,17 +12,20 @@ function UserRoutes() {
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <Routes>
+        <Route path='/' element={<Home />} />
         <Route path='users' element={<UsersPage />} />
         <Route path='users/page/:page' element={<UsersPage />} />
+ 
         {!login.isAdmin ||
         <>
-          <Route path='users/register' element={<RegisterPage />} />
-          <Route path='users/edit/:id' element={<RegisterPage />} />
+          <Route path='users/selectRegister' element={<SelectRegisterPage />} />
+          <Route path='users/edit/:id' element={<SelectRegisterPage />} />
         </>
         }
-        <Route path='/' element={<Navigate to='/users' />} />
+        {/* <Route path='/' element={<Navigate to='/users' />} /> */}
+        <Route path='/' element={<Navigate to='/' />} />
       </Routes>
     </>
   );

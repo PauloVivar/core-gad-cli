@@ -31,7 +31,7 @@ const useUsers = () => {
   //const [users, dispatch] = useReducer(usersReducer, initialUsers);
   
   //Redux para CRUD en el Frond
-  const { users, paginator, userSelected, visibleForm, errors, isLoading } = useSelector((state) => state.users);
+  const { users, userSelected, visibleForm, errors, isLoading, paginator } = useSelector((state) => state.users);
   const dispatch = useDispatch();
 
   //Navigate para redirigir a UsersPage
@@ -49,6 +49,46 @@ const useUsers = () => {
       }
     }
   };
+
+  const handlerRegisterUser = async (user) => {
+    let response;
+    try {
+      response = await save(user);
+      dispatch(addUser(response.data));
+
+      Swal.fire({
+        title: 'Usuario creado!',
+        text: 'Usuario creado con éxito',
+        icon: 'success',
+      });
+
+      //Redirigir a login
+      navigate('/login');
+
+    } catch (error) {
+      if (error.response && error.response.status == 400) {
+        //console.error('solicitud_incorrecta:',error.response.data);
+        dispatch(loadingError(error.response.data));
+      } else if (
+        //500 -> error de server || 403 -> prohibido
+        error.response &&
+        error.response.status == 403 &&
+        error.response.data?.message?.includes('constraint')
+        ) {
+          if (error.response.data?.message?.includes('users_username_key')) {
+            console.log({username: 'El username ya existe'});
+            dispatch(loadingError({ username: 'El username ya existe' }));
+          }
+          if (error.response.data?.message?.includes('users_email_key')) {
+            console.log({email: 'El email ya existe'});
+            dispatch(loadingError({ email: 'El email ya existe' }));
+          }
+      } else {
+        //console.log('test_register_pv!!!')
+        throw error;
+      }
+    }
+  }
 
   const handlerAddUser = async (user) => {
     let response;
@@ -78,6 +118,7 @@ const useUsers = () => {
       handlerCloseForm();
       //Redirigir a UsersPage
       navigate('/users');
+
     } catch (error) {
       if (error.response && error.response.status == 400) {
         //console.error('solicitud_incorrecta:',error.response.data);
@@ -101,7 +142,7 @@ const useUsers = () => {
         handlerLogout();
 
       } else {
-        console.log("pruebas pv")
+        //console.log('pruebas pv');
         throw error;
       }
     }
@@ -162,12 +203,13 @@ const useUsers = () => {
 
   return {
     users,
-    paginator,
     userSelected,
     initialUserForm,
     visibleForm,
     errors,
     isLoading,
+    paginator,
+    handlerRegisterUser,
     handlerAddUser,
     handlerDeleteUser,
     handlerSelectedUserForm,

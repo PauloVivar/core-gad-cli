@@ -54,7 +54,7 @@ export const usersSlice = createSlice ({
     },
     loadingUsers: (state, action) => {
       state.users = action.payload.content;
-      state.users = action.payload;
+      state.paginator = action.payload;
       state.isLoading = false;
     },
     onSelectedUserForm: (state, action) => {

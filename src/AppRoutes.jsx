@@ -1,9 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './auth/hooks/useAuth';
 
-import { LoginPage } from './auth/pages/LoginPage';
 import { UserRoutes } from './routes/UserRoutes';
 import { Skeleton } from './components/ui/skeleton';
+
+import { LoginPage } from './auth/pages/LoginPage';
+import { NotFound } from './pages/NotFound';
+import { Home } from './pages/Home';
+import { Navbar } from './components/Navbar';
 
 const AppRoutes = () => {
   const { login } = useAuth();
@@ -22,25 +26,25 @@ const AppRoutes = () => {
   }
 
   return (
-    <Routes>
-      {login.isAuth ? (
-        <Route
-          path='/*'
-          element={<UserRoutes />}
-        />
-      ) : (
-        <>
-          <Route
-            path='/login'
-            element={<LoginPage />}
-          />
-          <Route
-            path='/*'
-            element={<Navigate to='/login' />}
-          />
-        </>
-      )}
-    </Routes>
+    <>
+      {/* test */}
+      <Navbar />
+      <Routes>
+        {login.isAuth ? ( <Route path='/*' element={<UserRoutes />}/>
+        ) : (
+          <>
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/register' element={<LoginPage />} />
+            
+            {/* test */}
+            <Route path='/' element={<Home />} />
+            {/* test */}
+            <Route path='/*' element={<NotFound />} />
+            {/* <Route path='/*' element={<Navigate to='/login' />} /> */}
+          </>
+        )}
+      </Routes>
+    </>
   );
 };
 

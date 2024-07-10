@@ -6,7 +6,7 @@ import { UserForm } from '../../components/UserForm';
 import { useUsers } from '@/hooks/useUsers';
 
 
-function RegisterPage() {
+function SelectRegisterPage() {
 
   //useUsers hook(Redux) se reemplaza por useContext
   const { users=[], initialUserForm } = useUsers();
@@ -41,4 +41,4 @@ function RegisterPage() {
   );
 }
 
-export { RegisterPage };
+export { SelectRegisterPage };
