@@ -14,6 +14,8 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { toast } from '@/components/ui/use-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 
 const FormSchema = z.object({
   mobile: z.boolean().default(false).optional(),
@@ -22,7 +24,13 @@ const FormSchema = z.object({
 function TermsCheckbox() {
 
   const [accepted, setAccepted] = useState(false);
-  
+
+  //Redux para CRUD en el Frond
+  const { latestTerms, status } = useSelector((state) => state.terms);
+  const { users, userSelected } = useSelector((state) => state.users);
+
+  const dispatch = useDispatch();
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {

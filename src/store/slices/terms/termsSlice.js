@@ -1,14 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 //Se inicializa id=0 para seleccionar y update.
-export const initialTermsForm = {
-  id: 0,
-  version: '',
-  content: '',
-  effectiveDate: '',
-};
+// export const initialTermsForm = {
+//   id: 0,
+//   version: '',
+//   content: '',
+//   effectiveDate: '',
+// };
 
-const termsSlice = createSlice ({
+const termsSlice = createSlice({
   name: 'terms',
   initialState: {
     latestTerms: null,
@@ -16,18 +16,27 @@ const termsSlice = createSlice ({
     status: 'idle',
     error: null,
   },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(getLatestTerms.fulfilled, (state, action) => {
-        state.latestTerms = action.payload;
-        state.status = 'succeeded';
-      })
-      .addCase(acceptTerms.fulfilled, (state, action) => {
-        state.acceptanceStatus = 'accepted';
-        state.status = 'succeeded';
-      });
-  }
+  reducers: {
+    setLatestTerms: (state, action) => {
+      state.latestTerms = action.payload;
+      state.status = 'succeeded';
+    },
+    setAcceptanceStatus: (state, action) => {
+      state.acceptanceStatus = 'accepted';
+      state.status = 'succeeded';
+    },
+    setStatus: (state, action) => {
+      state.status = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+      state.status = 'failed';
+    },
+  },
 });
 
-export default termsSlice.actions;
+export const { 
+  setLatestTerms, 
+  setAcceptanceStatus, 
+  setStatus, 
+  setError } = termsSlice.actions;
