@@ -7,6 +7,7 @@ export const initialUserForm = {
   email: '',
   password: '',
   admin: false,
+  //terms: false, //test
 };
 
 const initialErrors = {

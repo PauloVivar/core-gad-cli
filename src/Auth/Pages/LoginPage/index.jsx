@@ -292,7 +292,7 @@ function LoginPage() {
                               {...field}
                             />
                           </FormControl>
-                          {/* <FormMessage>{errors?.username}</FormMessage> */}
+                          <FormMessage>{errors?.username}</FormMessage>
                         </FormItem>
                       )}
                     />
@@ -330,7 +330,7 @@ function LoginPage() {
                               {...field}
                             />
                           </FormControl>
-                          {/* <FormMessage>{errors?.email}</FormMessage> */}
+                          <FormMessage>{errors?.email}</FormMessage>
                         </FormItem>
                       )}
                     />
