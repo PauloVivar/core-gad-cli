@@ -8,6 +8,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -27,6 +33,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Layout } from '@/components/Layout';
 
 
@@ -53,6 +60,7 @@ const userRegisterSchema = z.object({
   email: z.string().email({
     message: 'Ingrese un email válido.',
   }),
+  terms_acceptance: z.boolean().default(false).optional(),
   admin: z.boolean().default(false).optional(),
 });
 
@@ -115,7 +123,75 @@ function LoginPage() {
 
   return (
     <Layout>
-      <div className='w-full h-full flex justify-center items-center'>
+      <div className='w-full h-full flex flex-col justify-center items-center gap-4'>
+        <Accordion type='single' collapsible className='w-[80%]'>
+          <AccordionItem value='item-1'>
+            <AccordionTrigger>Gu&iacute;a de Ingreso</AccordionTrigger>
+            <AccordionContent>
+              <ul className='space-y-2'>
+                <li className='flex items-center'>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Seleccione el tipo de persona.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Ingrese su documento de identidad y la información que se le solicita.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Acepte el acceso a la información.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Presione el botón validar.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Confirme el captcha de seguridad.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Complete los campos requeridos (*).
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Acepte el acuerdo de responsabilidad (*).
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Presione el botón Aceptar y continuar.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Para la activación del usuario debe firmar el acuerdo de responsabilidad, 
+                  si es persona jurídica el acuerdo debe ser firmado por el representante legal.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Escoja si la firma es electrónica (archivo p12) o firma manuscrita.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Si la firma es electrónica, presione el botón Firmar Acuerdo y proceda a seleccionar 
+                  zona de firma, escoger el archivo p12 e ingresar la contraseña de su firma.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Si la firma es manuscrita, presione el botón Descargar Acuerdo, el mismo que deberá 
+                  ser impreso y firmado. A continuación debe escanear el acuerdo y subirlo en la sección 
+                  Adjuntar Acuerdo. Para la verificación de identidad debe adjuntar una fotografía (tipo selfie) 
+                  con su documento de identidad.
+                </li>
+                <li>
+                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  Presione el botón Finalizar, si firmó electrónicamente, el usuario será activado de 
+                  forma automática. Caso contrario, será activado hasta en 1 día hábil.
+                </li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
         <Tabs
           value={selected}
           onValueChange={handleTabChange}
@@ -258,6 +334,7 @@ function LoginPage() {
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={formRegister.control}
                       name='id'
@@ -266,6 +343,32 @@ function LoginPage() {
                           <FormControl>
                             <Input type='hidden' {...field} />
                           </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={formRegister.control}
+                      name='terms_acceptance'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className='space-y-1 leading-none'>
+                            <FormLabel>
+                              Aceptar t&eacute;rminos y condiciones
+                            </FormLabel>
+                            <FormDescription>
+                              Aceptas nuestros Términos de servicio y Política de privacidad.{' '}
+                              <Link className='font-medium' href='/termsAcceptance'>
+                                T&eacute;rminos y Condiciones
+                              </Link> .
+                            </FormDescription>
+                          </div>
                         </FormItem>
                       )}
                     />
