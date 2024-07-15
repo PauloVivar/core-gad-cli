@@ -7,7 +7,7 @@ export const initialUserForm = {
   email: '',
   password: '',
   admin: false,
-  //terms: false, //test
+  //acceptTerms: false, //test
 };
 
 const initialErrors = {
@@ -20,11 +20,11 @@ export const usersSlice = createSlice ({
   name: 'users',
   initialState: {
     users: [],
-    paginator: {},                            //paginacion
     userSelected: initialUserForm,            //selecionar row de tabla usuarios para update
     visibleForm: false,                       //ocultar formulario
     errors: initialErrors,                    //guardar errores config en el backend
     isLoading: true,                          //espera hasta que carga la grilla(tabla)
+    paginator: {},                            //paginacion
   },
   reducers: {
     addUser: (state, action) => {

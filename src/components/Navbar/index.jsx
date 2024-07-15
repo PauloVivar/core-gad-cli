@@ -143,19 +143,35 @@ const Navbar = () => {
                 </NavLink>
 
                 {!login.isAdmin ||
-                  <NavLink
-                    to='/users/selectRegister'
-                    className={({ isActive }) =>
-                      `${commonClasses} ${
-                        isActive 
-                          ? 'bg-muted text-primary transition-all hover:text-primary' 
-                          : 'text-muted-foreground transition-all hover:text-primary'
-                      }`
-                    }
-                  >
-                    <PresentationChartBarIcon className='h-4 w-4' />
-                    Registar Usuarios{' '}
-                  </NavLink>
+                  <>
+                    <NavLink
+                      to='/users/selectRegister'
+                      className={({ isActive }) =>
+                        `${commonClasses} ${
+                          isActive 
+                            ? 'bg-muted text-primary transition-all hover:text-primary' 
+                            : 'text-muted-foreground transition-all hover:text-primary'
+                        }`
+                      }
+                    >
+                      <PresentationChartBarIcon className='h-4 w-4' />
+                      Registar Usuarios{' '}
+                    </NavLink>
+
+                    <NavLink
+                      to='/terms'
+                      className={({ isActive }) =>
+                        `${commonClasses} ${
+                          isActive 
+                            ? 'bg-muted text-primary transition-all hover:text-primary' 
+                            : 'text-muted-foreground transition-all hover:text-primary'
+                        }`
+                      }
+                      >
+                      <PresentationChartBarIcon className='h-4 w-4' />
+                      Registar Téminos y Codiciones{' '}
+                    </NavLink>
+                  </>
                 }
                 
               </nav>

@@ -1,48 +1,199 @@
 import { useNavigate } from 'react-router-dom';
-// import { useAuth } from '@/auth/hooks/useAuth';
-import { findAll, remove, save, update, getLatestTerms, acceptTerms } from '@/services/termsService';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAuth } from '@/auth/hooks/useAuth';
+
+import { 
+  findAll, 
+  remove, 
+  save, 
+  update, 
+  //findLatestTerms,
+  //checkUserTermsStatus,
+  //recordTermsInteraction,
+} from '@/services/termsService';
+import {
+  initialTermForm,
+  addTerm,
+  removeTerm,
+  updateTerm,
+  loadingTerms,
+  onSelectedTermForm,
+  onOpenForm,
+  onCloseForm,
+  
+  //fetchTermsStart,
+  //fetchTermsSuccess,
+  setUserTermsStatus,
+  loadingError,
+} from '@/store/slices/terms/termsSlice';
 
 import Swal from 'sweetalert2';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  setLatestTerms, 
-  setAcceptanceStatus, 
-  setStatus, 
-  setError,
-} from '@/store/slices/terms/termsSlice';
 
 const useTerms = () => {
 
-  // Función asíncrona para obtener los últimos términos
-  const getLatestTerms = () => async dispatch => {
-    dispatch(setStatus('loading'));
+  const { handlerLogout } = useAuth();
+
+  const navigate = useNavigate();
+
+  //Redux para CRUD en el Frond
+  const { 
+    terms,
+    termSelected,
+    visibleForm,
+    errors,
+    isLoading,
+    latestTerms,
+    userTermsStatus,
+  } = useSelector((state) => state.terms);
+
+  const dispatch = useDispatch();
+
+  const getTerms = async () => {
     try {
-      const response = await fetch('/api/terms/latest'); // Suponiendo que esta es tu API
-      const data = await response.json();
-      dispatch(setLatestTerms(data));
+      const result = await findAll();
+      dispatch(loadingTerms(result.data));
     } catch (error) {
-      dispatch(setError(error.toString()));
+      if (error.response?.status == 401) {
+        handlerLogout();
+      }
     }
   };
 
-  // Función asíncrona para aceptar los términos
-  const acceptTerms = () => async dispatch => {
-    dispatch(setStatus('loading'));
+  const handlerAddTerm = async (term) => {
+    let response;
     try {
-      const response = await fetch('/api/terms/accept', { method: 'POST' });
-      if (response.ok) {
-        dispatch(setAcceptanceStatus());
+      if (term.id === 0) {
+        response = await save(term);
+        dispatch(addTerm(response.data));
       } else {
-        throw new Error('Failed to accept terms');
-      }
+        response = await update(term);
+        dispatch(updateTerm(response.data));
+      };
+
+      term.id === 0
+        ? Swal.fire({
+            title: 'Terminos y Condiciones creado!',
+            text: 'Terminos y Condiciones creado con éxito',
+            icon: 'success',
+          })
+        : Swal.fire({
+            title: 'Terminos y Condiciones actualizado!',
+            text: 'Terminos y Condiciones actualizo con éxito',
+            icon: 'success',
+          });
+
+      //Form oculto y reseteado
+      handlerCloseForm();
+      //Redirigir a TermsPage
+      navigate('/terms');
+
     } catch (error) {
-      dispatch(setError(error.toString()));
+      if (error.response && error.response.status == 400) {
+        dispatch(loadingError(error.response.data));
+      } else if (error.response?.status == 401) {
+        //console.error('no_autorizado:',error.response.data);
+        handlerLogout();
+      } else {
+        //console.log('pruebas pv');
+        throw error;
+      }
     }
+  }
+
+  const handlerDeleteTerm = (id) => {
+    //console.log(id);
+    Swal.fire({
+      title: '¿Estas Seguro?',
+      text: 'Este Término y Condición será eliminado!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si, bórralo!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // eliminar de la db -> Lógica para eliminar
+          await remove(id);
+          dispatch(removeTerm(id));
+
+          Swal.fire({
+            title: 'Eliminado!',
+            text: 'Término y Condición ha sido eliminado.',
+            icon: 'success',
+          });
+        } catch (error) {
+          if (error.response?.status == 401) {
+            handlerLogout();
+          }
+        }
+      }
+    });
   };
+
+  const handlerSelectedTermForm = (term) => {
+    //Se muestra form al seleccionar
+    dispatch(onSelectedTermForm({ ...term }));
+  };
+
+  const handlerOpenForm = () => {
+    dispatch(onOpenForm());
+  };
+
+  const handlerCloseForm = () => {
+    dispatch(onCloseForm());
+    //dispatch(loadingError({}));
+  };
+
+  // Función asíncrona para obtener los últimos términos
+  // const getLatestTerms = async () => {
+  //   try {
+  //     dispatch(fetchTermsStart());
+  //     const result = await findLatestTerms();
+  //     dispatch(fetchTermsSuccess(result.data));
+  //   } catch (error) {
+  //     dispatch(loadingError(error.message));
+  //   }
+  // };
+
+  // Función asíncrona para checkear el estado de términos de usuario
+  // const getCheckUserTermsStatus = async (userId) => {
+  //   try {
+  //     const result = await checkUserTermsStatus(userId);
+  //     dispatch(setUserTermsStatus(result.data));
+  //   } catch (error) {
+  //     dispatch(loadingError(error.message));
+  //   }
+  // };
+
+  // Función asíncrona para registrar la interacción de términos
+  // const getRecordTermsInteraction = async (userId, accepted, ipAddress) => {
+  //   try {
+  //     const result = await recordTermsInteraction(userId, accepted, ipAddress);
+  //     dispatch(checkUserTermsStatus(result.userId));
+  //   } catch (error) {
+  //     dispatch(loadingError(error.message));
+  //   }
+  // };
 
   return {
-    getLatestTerms,
-    acceptTerms,
+    initialTermForm,
+    terms,
+    termSelected,
+    visibleForm,
+    latestTerms,
+    userTermsStatus,
+    errors,
+    isLoading,
+    getTerms,
+    handlerAddTerm,
+    handlerDeleteTerm,
+    handlerSelectedTermForm,
+    handlerOpenForm,
+    handlerCloseForm,
+    //getLatestTerms,
+    //getCheckUserTermsStatus,
+    //getRecordTermsInteraction,
   };
 };
 

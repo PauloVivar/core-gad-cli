@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
+import { useTerms } from '@/hooks/useTerms';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -34,7 +35,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/components/ui/use-toast';
 import { Layout } from '@/components/Layout';
+
 
 
 //mod email
@@ -60,8 +63,10 @@ const userRegisterSchema = z.object({
   email: z.string().email({
     message: 'Ingrese un email válido.',
   }),
-  terms_acceptance: z.boolean().default(false).optional(),
   admin: z.boolean().default(false).optional(),
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: 'Debe aceptar los Términos y Condiciones.',
+  }),
 });
 
 //initial Login
@@ -81,6 +86,17 @@ function LoginPage() {
 
   //register: Context useUsers Global Redux.
   const { initialUserForm, handlerRegisterUser, errors } = useUsers();
+
+  //terms
+  const { 
+    initialTermForm, 
+    latestTerms, 
+    isLoading, 
+    //getLatestTerms, 
+    //getRecordTermsInteraction 
+  } = useTerms();
+
+  const { toast } = useToast();
 
   // 1. Define your form.
   const form = useForm({
@@ -105,10 +121,25 @@ function LoginPage() {
     form.reset();
   };
 
-  const onSubmitRegister = (data) => {
-    console.log('register_data: ', data);
-    handlerRegisterUser(data);
-    formRegister.reset();
+  const onSubmitRegister = async (data) => {
+    try {
+      handlerRegisterUser(data);
+      //const user = handlerRegisterUser(data);
+      // if (data.acceptTerms) {
+      //   await getRecordTermsInteraction(user.id, true, '127.0.0.1');  // Use actual IP in production
+      // }
+      toast({
+        title: "Success",
+        description: "Usuario creada con éxito!",
+      });
+      formRegister.reset();
+      
+    } catch (error) {
+      console.error(error);
+    }
+    // console.log('register_data: ', data);
+    // handlerRegisterUser(data);
+    // formRegister.reset();
   };
 
   //redirigir Tab login or register
@@ -117,9 +148,19 @@ function LoginPage() {
     navigate(value === 'account' ? '/login' : '/register');
   };
 
+  //account and register
   useEffect(() => {
     setSelected(location.pathname === '/login' ? 'account' : 'register');
   }, [location.pathname]);
+
+  //Terms
+  // useEffect(() => {
+  //   getLatestTerms();
+  // }, [getLatestTerms]);
+
+  if (isLoading) {
+    return <div>Loading terms...</div>;
+  }
 
   return (
     <Layout>
@@ -349,7 +390,7 @@ function LoginPage() {
 
                     <FormField
                       control={formRegister.control}
-                      name='terms_acceptance'
+                      name='acceptTerms'
                       render={({ field }) => (
                         <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
                           <FormControl>
@@ -363,7 +404,8 @@ function LoginPage() {
                               Aceptar t&eacute;rminos y condiciones
                             </FormLabel>
                             <FormDescription>
-                              Aceptas nuestros Términos de servicio y Política de privacidad.{' '}
+                              Aceptas nuestros Términos de servicio y Política de privacidad.
+                              {latestTerms ? latestTerms.content : 'No hay términos disponibles'}
                               <Link className='font-medium' href='/termsAcceptance'>
                                 T&eacute;rminos y Condiciones
                               </Link> .

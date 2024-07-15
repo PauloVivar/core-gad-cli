@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/auth/hooks/useAuth';
-import { findAllPages, remove, save, update } from '@/services/useService';
-
-import Swal from 'sweetalert2';
 import { useDispatch, useSelector } from 'react-redux';
+import { useAuth } from '@/auth/hooks/useAuth';
+
+import { findAllPages, remove, save, update } from '@/services/userService';
 import {
   initialUserForm,
   addUser,
@@ -15,6 +14,8 @@ import {
   onCloseForm,
   loadingError,
 } from '@/store/slices/users/usersSlice';
+
+import Swal from 'sweetalert2';
 
 // const initialUsers = [
 //   // {
@@ -31,7 +32,15 @@ const useUsers = () => {
   //const [users, dispatch] = useReducer(usersReducer, initialUsers);
   
   //Redux para CRUD en el Frond
-  const { users, userSelected, visibleForm, errors, isLoading, paginator } = useSelector((state) => state.users);
+  const { 
+    users, 
+    userSelected, 
+    visibleForm, 
+    errors, 
+    isLoading, 
+    paginator
+  } = useSelector((state) => state.users);
+
   const dispatch = useDispatch();
 
   //Navigate para redirigir a UsersPage

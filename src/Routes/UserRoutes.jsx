@@ -5,6 +5,7 @@ import { useAuth } from '@/auth/hooks/useAuth';
 import { SelectRegisterPage } from '../pages/SelectRegisterPage';
 import { UsersPage } from '../pages/UsersPage';
 import { Home } from '@/pages/Home';
+import { TermsPage } from '@/pages/TermsPage';
 
 function UserRoutes() {
 
@@ -22,6 +23,7 @@ function UserRoutes() {
         <>
           <Route path='users/selectRegister' element={<SelectRegisterPage />} />
           <Route path='users/edit/:id' element={<SelectRegisterPage />} />
+          <Route path='terms' element={<TermsPage />} />
         </>
         }
         {/* <Route path='/' element={<Navigate to='/users' />} /> */}
