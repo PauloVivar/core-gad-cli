@@ -129,8 +129,8 @@ function LoginPage() {
       //   await getRecordTermsInteraction(user.id, true, '127.0.0.1');  // Use actual IP in production
       // }
       toast({
-        title: "Success",
-        description: "Usuario creada con éxito!",
+        title: 'Success',
+        description: 'Usuario creada con éxito!',
       });
       formRegister.reset();
       
@@ -405,7 +405,7 @@ function LoginPage() {
                             </FormLabel>
                             <FormDescription>
                               Aceptas nuestros Términos de servicio y Política de privacidad.
-                              {latestTerms ? latestTerms.content : 'No hay términos disponibles'}
+                              {/* {latestTerms ? latestTerms.content : 'No hay términos disponibles'} */}
                               <Link className='font-medium' href='/termsAcceptance'>
                                 T&eacute;rminos y Condiciones
                               </Link> .
