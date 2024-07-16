@@ -5,12 +5,12 @@ const termsApi = axios.create({
 });
 
 //interceptor de la cabecera
-// termsApi.interceptors.request.use( config => {
-//   config.headers = {
-//     ...config.headers,
-//     'Authorization': sessionStorage.getItem('token'),
-//   };
-//   return config;
-// });
+termsApi.interceptors.request.use( config => {
+  config.headers = {
+    ...config.headers,
+    'Authorization': sessionStorage.getItem('token'),
+  };
+  return config;
+});
 
 export { termsApi };

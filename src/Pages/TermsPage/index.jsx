@@ -2,7 +2,6 @@ import { useTerms } from '@/hooks/useTerms';
 import { useAuth } from '@/auth/hooks/useAuth';
 
 import { Layout } from '../../components/Layout';
-import { TermRow } from '../../components/TermRow';
 import { TermsList } from '../../components/TermsList';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -10,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { TermForm } from '@/components/TermForm';
 
 
 function TermsPage() {
@@ -25,20 +25,23 @@ function TermsPage() {
 
   const { login } = useAuth();
 
-  if(isLoading){
-    return(
-      <div className='w-[95%] absolute mt-40 top-14 flex flex-col space-y-3 justify-center items-center text-center text-slate-500 
-        lg:w-[75%] lg:left-72'>
-        <Skeleton className='h-[100px] w-[400px] rounded-xl bg-slate-200' />
-        <div className='space-y-2'>
-          <Skeleton className='h-4 w-[400px] bg-slate-200' />
-          <Skeleton className='h-4 w-[400px] bg-slate-200' />
-          <Skeleton className='h-4 w-[400px] bg-slate-200' />
-          <p className='mt-4'>Cargando datos...</p>
-        </div>
-      </div>
-    )
-  };
+  // if(isLoading){
+  //   return(
+  //     <div className='w-[95%] absolute mt-40 top-14 flex flex-col space-y-3 justify-center items-center text-center text-slate-500 
+  //       lg:w-[75%] lg:left-72'>
+  //       <Skeleton className='h-[100px] w-[400px] rounded-xl bg-slate-200' />
+  //       <div className='space-y-2'>
+  //         <Skeleton className='h-4 w-[400px] bg-slate-200' />
+  //         <Skeleton className='h-4 w-[400px] bg-slate-200' />
+  //         <Skeleton className='h-4 w-[400px] bg-slate-200' />
+  //         <p className='mt-4'>Cargando datos...</p>
+  //         test
+  //       </div>
+  //     </div>
+  //   )
+  // };
+
+  console.log('hola', terms, terms.length);
 
   return (
     <Layout>
@@ -50,7 +53,7 @@ function TermsPage() {
 
           <div className='w-full h-full p-2 m-2 flex flex-row justify-center gap-4'>
             {!visibleForm || (
-              <TermRow
+              <TermForm
                 termSelected={termSelected}
                 handlerCloseForm={handlerCloseForm}
               />
@@ -62,9 +65,9 @@ function TermsPage() {
               {terms.length === 0 ? (
                 <Alert variant='destructive'>
                   <ExclamationCircleIcon className='size-5 text-red-500'/>
-                  <AlertTitle>Atención</AlertTitle>
+                  <AlertTitle>Atención!</AlertTitle>
                   <AlertDescription>
-                    No hay Terminos y condiciones en el sistema, por favor crear un nuevo registro.
+                    No hay Términos y Condiciones en el sistema, por favor crear un nuevo registro.
                   </AlertDescription>
                 </Alert>
               ) : (

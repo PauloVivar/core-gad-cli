@@ -23,7 +23,7 @@ import {
   
   //fetchTermsStart,
   //fetchTermsSuccess,
-  setUserTermsStatus,
+  //setUserTermsStatus,
   loadingError,
 } from '@/store/slices/terms/termsSlice';
 
@@ -41,9 +41,10 @@ const useTerms = () => {
     termSelected,
     visibleForm,
     errors,
-    isLoading,
+
     latestTerms,
     userTermsStatus,
+    isLoading,
   } = useSelector((state) => state.terms);
 
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ const useTerms = () => {
   const getTerms = async () => {
     try {
       const result = await findAll();
+      console.log('list_t: ', result);
       dispatch(loadingTerms(result.data));
     } catch (error) {
       if (error.response?.status == 401) {
@@ -72,13 +74,13 @@ const useTerms = () => {
 
       term.id === 0
         ? Swal.fire({
-            title: 'Terminos y Condiciones creado!',
-            text: 'Terminos y Condiciones creado con éxito',
+            title: 'Términos y Condiciones creado!',
+            text: 'Términos y Condiciones creado con éxito',
             icon: 'success',
           })
         : Swal.fire({
-            title: 'Terminos y Condiciones actualizado!',
-            text: 'Terminos y Condiciones actualizo con éxito',
+            title: 'Términos y Condiciones actualizado!',
+            text: 'Términos y Condiciones actualizo con éxito',
             icon: 'success',
           });
 
@@ -142,7 +144,7 @@ const useTerms = () => {
 
   const handlerCloseForm = () => {
     dispatch(onCloseForm());
-    //dispatch(loadingError({}));
+    dispatch(loadingError({}));
   };
 
   // Función asíncrona para obtener los últimos términos
@@ -181,9 +183,9 @@ const useTerms = () => {
     terms,
     termSelected,
     visibleForm,
+    errors,
     latestTerms,
     userTermsStatus,
-    errors,
     isLoading,
     getTerms,
     handlerAddTerm,

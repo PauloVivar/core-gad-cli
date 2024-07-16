@@ -1,5 +1,6 @@
 import { useTerms } from '@/hooks/useTerms';
 import { useAuth } from '@/auth/hooks/useAuth';
+import { TermRow } from './TermRow';
 
 import {
   Table,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/table';
 
 import { Card } from '@/components/ui/card';
-import { UserRow } from './UserRow';
 
 const TermsList = () => {
 
@@ -29,6 +29,8 @@ const TermsList = () => {
               <TableHead>Version</TableHead>
               <TableHead>Content</TableHead>
               <TableHead>EffectiveDate</TableHead>
+              <TableHead>CreatedDate</TableHead>
+              <TableHead>LastModifiedDate</TableHead>
               {!login.isAdmin ||
                 <TableHead>Acciones</TableHead>
               }
@@ -36,13 +38,15 @@ const TermsList = () => {
           </TableHeader>
 
           <TableBody>
-            {terms.map(({ id, version, content, effectiveDate }) => (
-              <UserRow
+            {terms.map(({ id, version, content, effectiveDate, created_date, last_modified_date }) => (
+              <TermRow
                 key={id}
                 id={id}
                 version={version}
                 content={content}
                 effectiveDate={effectiveDate}
+                created_date={created_date}
+                last_modified_date={last_modified_date}
               />
             ))}
           </TableBody>

@@ -169,7 +169,7 @@ const Navbar = () => {
                       }
                       >
                       <PresentationChartBarIcon className='h-4 w-4' />
-                      Registar Téminos y Codiciones{' '}
+                      Téminos y Codiciones{' '}
                     </NavLink>
                   </>
                 }

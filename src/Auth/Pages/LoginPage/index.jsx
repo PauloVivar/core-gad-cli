@@ -89,8 +89,8 @@ function LoginPage() {
 
   //terms
   const { 
-    initialTermForm, 
-    latestTerms, 
+    //initialTermForm, 
+    //latestTerms, 
     isLoading, 
     //getLatestTerms, 
     //getRecordTermsInteraction 
@@ -157,10 +157,6 @@ function LoginPage() {
   // useEffect(() => {
   //   getLatestTerms();
   // }, [getLatestTerms]);
-
-  if (isLoading) {
-    return <div>Loading terms...</div>;
-  }
 
   return (
     <Layout>

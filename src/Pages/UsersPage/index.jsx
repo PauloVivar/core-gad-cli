@@ -73,7 +73,7 @@ function UsersPage() {
               {users.length === 0 ? (
                 <Alert variant='destructive'>
                   <ExclamationCircleIcon className='size-5 text-red-500'/>
-                  <AlertTitle>Atención</AlertTitle>
+                  <AlertTitle>Atención!</AlertTitle>
                   <AlertDescription>
                     No hay usuarios en el sistema, por favor crear un nuevo registro.
                   </AlertDescription>

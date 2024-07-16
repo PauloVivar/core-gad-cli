@@ -13,7 +13,7 @@ const findAll = async () => {
   }
 }
 
-const save = async ({ version, content, effectiveDate }) =>{
+const save = async ({ version, content, effectiveDate }) => {
   try {
     return await termsApi.post(BASE_URL, {
       version,
@@ -31,6 +31,8 @@ const update = async ({ id, version, content, effectiveDate }) => {
       version,
       content,
       effectiveDate,
+      created_date: 'nothing',
+      last_modified_date: 'nothing',
       //password: 'nothing',  //lo realiza el backend UserRequest
     });
   } catch (error) {

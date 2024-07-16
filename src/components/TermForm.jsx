@@ -20,15 +20,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Textarea } from './ui/textarea';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
 
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 //Validation Schema
 const termSchema = z.object({
@@ -59,7 +60,7 @@ function TermForm({ termSelected, handlerCloseForm }) {
 
   // 2. Define a submit handler.
   const onSubmit = (data) => {
-    console.log('data: ', data);
+    console.log('datos: ', data);
     handlerAddTerm(data);
     form.reset();
   }
@@ -70,6 +71,8 @@ function TermForm({ termSelected, handlerCloseForm }) {
       if (termSelected){
         const term = await {
           ...termSelected,
+          created_date:'',
+          last_modified_date:'',
         };
         //console.log('use_Effect: ',term.admin);
         form.setValue('id', term.id);
@@ -96,7 +99,7 @@ function TermForm({ termSelected, handlerCloseForm }) {
               name='version'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Versión Términos y Condiciones</FormLabel>
+                  <FormLabel>Versión de Términos y Condiciones</FormLabel>
                   <FormControl>
                     <Input placeholder='Ingrese la version' {...field} />
                   </FormControl>
@@ -112,13 +115,10 @@ function TermForm({ termSelected, handlerCloseForm }) {
                 name='content'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Contenido Términos y Condiciones</FormLabel>
+                    <FormLabel>Contenido de Términos y Condiciones</FormLabel>
                     <FormControl>
-                      <Input placeholder='Ingrese su content' type='content' {...field} />
+                      <Textarea placeholder='Ingrese su contenido' type='content' {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Ingrese una contraseña segura
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -144,7 +144,7 @@ function TermForm({ termSelected, handlerCloseForm }) {
                           {field.value ? (
                             format(field.value, 'PPP')
                           ) : (
-                            <span>Ingrese Fecha Efectiva</span>
+                            <span>Ingrese la fecha efectiva</span>
                           )}
                           <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                         </Button>
@@ -154,16 +154,19 @@ function TermForm({ termSelected, handlerCloseForm }) {
                       <Calendar
                         mode='single'
                         selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date('1900-01-01')
-                        }
+                        //onSelect={field.onChange}
+                        onSelect={(date) => {
+                          // Crear un objeto Date solo con la fecha
+                          const dateOnly = new Date(date);
+                          dateOnly.setHours(0, 0, 0, 0); // Configurar la hora a 00:00:00
+                          field.onChange(dateOnly);
+                        }}
                         initialFocus
                       />
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    La fecha efectiva define desde qué momento se aplican las políticas, derechos y obligaciones especificadas en el documento.
+                    Fecha Efectiva define desde qué momento se aplican los Términos y Condiciones especificados en el documento.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

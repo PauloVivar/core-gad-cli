@@ -50,7 +50,7 @@ const useUsers = () => {
   const getUsers = async (page = 0) => {
     try {
       const result = await findAllPages(page);
-      //console.log(result);
+      // console.log('list_u: ', result);
       dispatch(loadingUsers(result.data));
     } catch (error) {
       if (error.response?.status == 401) {
@@ -207,7 +207,7 @@ const useUsers = () => {
 
   const handlerCloseForm = () => {
     dispatch(onCloseForm());
-    //dispatch(loadingError({}));
+    dispatch(loadingError({}));
   };
 
   return {

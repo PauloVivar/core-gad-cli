@@ -6,12 +6,16 @@ export const initialTermForm = {
   version: '',
   content: '',
   effectiveDate: '',
+  created_date: '',
+  last_modified_date: '',
 };
 
 const initialErrors = {
   version: '',
   content: '',
   effectiveDate: '',
+  created_date: '',
+  last_modified_date: '',
 };
 
 export const termsSlice = createSlice({
@@ -20,10 +24,10 @@ export const termsSlice = createSlice({
     terms: [],
     termSelected: initialTermForm,
     visibleForm: false,
+    errors: initialErrors,
 
     latestTerms: null,             //último término
     userTermsStatus: null,         //status del término
-    errors: initialErrors,
     isLoading: true,
   },
   reducers: {
@@ -68,10 +72,10 @@ export const termsSlice = createSlice({
       state.termSelected= initialTermForm;
     },
 
-    fetchTermsStart(state) {
-      state.isLoading = true;
-      state.errors = null;
-    },
+    // fetchTermsStart(state) {
+    //   state.isLoading = true;
+    //   state.errors = null;
+    // },
     fetchTermsSuccess(state, action) {
       state.latestTerms = action.payload;
       state.isLoading = false;
@@ -82,7 +86,7 @@ export const termsSlice = createSlice({
 
     loadingError: (state, action) => {
       state.errors = action.payload;
-      state.isLoading = false;
+      //state.isLoading = false;
     }
   },
 });
@@ -96,7 +100,8 @@ export const {
   onOpenForm,
   onCloseForm,
 
-  fetchTermsStart,
+  //fetchTermsStart,
   fetchTermsSuccess,
   setUserTermsStatus,
-  loadingError } = termsSlice.actions;
+  loadingError,
+} = termsSlice.actions;
