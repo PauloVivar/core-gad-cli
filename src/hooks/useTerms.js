@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '@/auth/hooks/useAuth';
@@ -7,9 +8,10 @@ import {
   remove, 
   save, 
   update, 
-  //findLatestTerms,
-  //checkUserTermsStatus,
-  //recordTermsInteraction,
+  findLatestTerm,
+
+  checkUserTermsStatus,
+  recordTermsInteraction,
 } from '@/services/termsService';
 import {
   initialTermForm,
@@ -20,10 +22,11 @@ import {
   onSelectedTermForm,
   onOpenForm,
   onCloseForm,
-  
-  //fetchTermsStart,
-  //fetchTermsSuccess,
-  //setUserTermsStatus,
+
+  fetchLatestTermStart,
+  fetchLatestTermSuccess,
+  fetchLatestTermError,
+  setUserTermsStatus,
   loadingError,
 } from '@/store/slices/terms/termsSlice';
 
@@ -42,17 +45,20 @@ const useTerms = () => {
     visibleForm,
     errors,
 
-    latestTerms,
+    latestTerm,
+    latestTermError,
     userTermsStatus,
     isLoading,
   } = useSelector((state) => state.terms);
 
   const dispatch = useDispatch();
 
+  const [showLatestTerm, setShowLatestTerm] = useState(false);
+
   const getTerms = async () => {
     try {
       const result = await findAll();
-      console.log('list_t: ', result);
+      //console.log('list_t: ', result);
       dispatch(loadingTerms(result.data));
     } catch (error) {
       if (error.response?.status == 401) {
@@ -148,35 +154,45 @@ const useTerms = () => {
   };
 
   // Función asíncrona para obtener los últimos términos
-  // const getLatestTerms = async () => {
-  //   try {
-  //     dispatch(fetchTermsStart());
-  //     const result = await findLatestTerms();
-  //     dispatch(fetchTermsSuccess(result.data));
-  //   } catch (error) {
-  //     dispatch(loadingError(error.message));
-  //   }
-  // };
+  const getLatestTerms = async () => {
+    if (!showLatestTerm && !latestTerm) {
+      dispatch(fetchLatestTermStart());
+      try {
+        const result = await findLatestTerm();
+        if (result && result.data) {
+          dispatch(fetchLatestTermSuccess(result.data));
+          setShowLatestTerm(true);
+        }else{
+          dispatch(fetchLatestTermError('No se encontraron términos recientes.'));
+        }
+      } catch (error) {
+        console.error('Error al obtener el último término:', error);
+        dispatch(fetchLatestTermError('Hubo un error al obtener el último término. Por favor, intente de nuevo.'));
+      }
+    }else {
+      setShowLatestTerm(!showLatestTerm);
+    }
+  };
 
   // Función asíncrona para checkear el estado de términos de usuario
-  // const getCheckUserTermsStatus = async (userId) => {
-  //   try {
-  //     const result = await checkUserTermsStatus(userId);
-  //     dispatch(setUserTermsStatus(result.data));
-  //   } catch (error) {
-  //     dispatch(loadingError(error.message));
-  //   }
-  // };
+  const getCheckUserTermsStatus = async (userId) => {
+    try {
+      const result = await checkUserTermsStatus(userId);
+      dispatch(setUserTermsStatus(result.data));
+    } catch (error) {
+      dispatch(loadingError(error.message));
+    }
+  };
 
   // Función asíncrona para registrar la interacción de términos
-  // const getRecordTermsInteraction = async (userId, accepted, ipAddress) => {
-  //   try {
-  //     const result = await recordTermsInteraction(userId, accepted, ipAddress);
-  //     dispatch(checkUserTermsStatus(result.userId));
-  //   } catch (error) {
-  //     dispatch(loadingError(error.message));
-  //   }
-  // };
+  const getRecordTermsInteraction = async (userId, accepted, ipAddress) => {
+    try {
+      const result = await recordTermsInteraction(userId, accepted, ipAddress);
+      dispatch(checkUserTermsStatus(result.userId));
+    } catch (error) {
+      dispatch(loadingError(error.message));
+    }
+  };
 
   return {
     initialTermForm,
@@ -184,18 +200,24 @@ const useTerms = () => {
     termSelected,
     visibleForm,
     errors,
-    latestTerms,
+    latestTerm,
+    latestTermError,
     userTermsStatus,
     isLoading,
+
+    showLatestTerm,
+    setShowLatestTerm,
+    
     getTerms,
     handlerAddTerm,
     handlerDeleteTerm,
     handlerSelectedTermForm,
     handlerOpenForm,
     handlerCloseForm,
-    //getLatestTerms,
-    //getCheckUserTermsStatus,
-    //getRecordTermsInteraction,
+    getLatestTerms,
+    
+    getCheckUserTermsStatus,
+    getRecordTermsInteraction,
   };
 };
 

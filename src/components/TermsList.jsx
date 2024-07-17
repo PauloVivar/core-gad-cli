@@ -29,8 +29,6 @@ const TermsList = () => {
               <TableHead>Version</TableHead>
               <TableHead>Content</TableHead>
               <TableHead>EffectiveDate</TableHead>
-              <TableHead>CreatedDate</TableHead>
-              <TableHead>LastModifiedDate</TableHead>
               {!login.isAdmin ||
                 <TableHead>Acciones</TableHead>
               }
@@ -38,15 +36,13 @@ const TermsList = () => {
           </TableHeader>
 
           <TableBody>
-            {terms.map(({ id, version, content, effectiveDate, created_date, last_modified_date }) => (
+            {terms.map(({ id, version, content, effectiveDate }) => (
               <TermRow
                 key={id}
                 id={id}
                 version={version}
                 content={content}
                 effectiveDate={effectiveDate}
-                created_date={created_date}
-                last_modified_date={last_modified_date}
               />
             ))}
           </TableBody>

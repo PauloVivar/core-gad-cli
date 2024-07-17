@@ -6,16 +6,12 @@ export const initialTermForm = {
   version: '',
   content: '',
   effectiveDate: '',
-  created_date: '',
-  last_modified_date: '',
 };
 
 const initialErrors = {
   version: '',
   content: '',
   effectiveDate: '',
-  created_date: '',
-  last_modified_date: '',
 };
 
 export const termsSlice = createSlice({
@@ -26,18 +22,23 @@ export const termsSlice = createSlice({
     visibleForm: false,
     errors: initialErrors,
 
-    latestTerms: null,             //último término
+    latestTerm: null,             //último término
+    latestTermError: null,
     userTermsStatus: null,         //status del término
     isLoading: true,
   },
   reducers: {
     addTerm: (state, action) => {
-      state.terms = [
-        ...state.terms,
-        {
-          ...action.payload,
-        }
-      ];
+      // state.terms = [
+      //   ...state.terms,
+      //   {
+      //     ...action.payload,
+      //   }
+      // ];
+      const newTerm = action.payload;
+      state.terms.unshift(newTerm);
+      state.latestTerm = newTerm;          // Actualizar latestTerm
+
       state.termSelected= initialTermForm;
       state.visibleForm= false;
     },
@@ -45,14 +46,22 @@ export const termsSlice = createSlice({
       state.terms = state.terms.filter(term => term.id !== action.payload);
     },
     updateTerm: (state, action) => {
-      state.terms = state.terms.map(term => {
-        if (term.id === action.payload.id) {
-          return {
-            ...action.payload,
-          };
-        } 
-        return term;
-      });
+      // state.terms = state.terms.map(term => {
+      //   if (term.id === action.payload.id) {
+      //     return {
+      //       ...action.payload,
+      //     };
+      //   } 
+      //   return term;
+      // });
+      const updatedTerm = action.payload;
+      state.terms = state.terms.map(term => 
+        term.id === updatedTerm.id ? updatedTerm : term
+      );
+      if (state.latestTerm && state.latestTerm.id === updatedTerm.id) {
+        state.latestTerm = updatedTerm; // Actualizar latestTerm si es necesario
+      }
+      
       state.termSelected= initialTermForm;
       state.visibleForm= false;
     },
@@ -72,14 +81,35 @@ export const termsSlice = createSlice({
       state.termSelected= initialTermForm;
     },
 
-    // fetchTermsStart(state) {
-    //   state.isLoading = true;
-    //   state.errors = null;
-    // },
-    fetchTermsSuccess(state, action) {
-      state.latestTerms = action.payload;
+    fetchLatestTermStart(state) {
+      state.isLoading = true;
+      state.latestTermError = null;
+    },
+    fetchLatestTermSuccess(state, action) {
+      const newLatestTerm = action.payload;
+      state.latestTerm = newLatestTerm;
+      
+      // Sincronizar con el array de términos
+      const existingTermIndex = state.terms.findIndex(term => term.id === newLatestTerm.id);
+      if (existingTermIndex !== -1) {
+        // Actualizar el término existente
+        state.terms[existingTermIndex] = newLatestTerm;
+      } else {
+        // Agregar el nuevo término al principio del array
+        state.terms.unshift(newLatestTerm);
+      }
+      
+      state.isLoading = false;
+
+      //old
+      //state.latestTerm = action.payload;
+      //state.isLoading = false;
+    },
+    fetchLatestTermError(state, action) {
+      state.latestTermError = action.payload;
       state.isLoading = false;
     },
+
     setUserTermsStatus(state, action) {
       state.userTermsStatus = action.payload;
     },
@@ -100,8 +130,9 @@ export const {
   onOpenForm,
   onCloseForm,
 
-  //fetchTermsStart,
-  fetchTermsSuccess,
+  fetchLatestTermStart,
+  fetchLatestTermSuccess,
+  fetchLatestTermError,
   setUserTermsStatus,
   loadingError,
 } = termsSlice.actions;

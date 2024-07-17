@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
@@ -31,14 +31,20 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { Layout } from '@/components/Layout';
-
-
 
 //mod email
 //Validation Schema Login
@@ -80,66 +86,105 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [selected, setSelected] = useState(location.pathname === '/login' ? 'account' : 'register');
+  const [showTerms, setShowTerms] = useState(false);
 
   //login
-  const { handlerLogin } = useAuth();
+  const { login, handlerLogin  } = useAuth();
 
   //register: Context useUsers Global Redux.
   const { initialUserForm, handlerRegisterUser, errors } = useUsers();
 
-  //terms
+  //Context useTerms Global Redux.
   const { 
-    //initialTermForm, 
-    //latestTerms, 
-    isLoading, 
-    //getLatestTerms, 
-    //getRecordTermsInteraction 
+    latestTerm, 
+    getLatestTerms,
+    getCheckUserTermsStatus, 
+    getRecordTermsInteraction,
   } = useTerms();
 
   const { toast } = useToast();
 
-  // 1. Define your form.
-  const form = useForm({
+  // 1. Define your loginForm and registerForm
+  const loginForm = useForm({
     resolver: zodResolver(userLoginSchema),
     defaultValues: initialLoginForm,
   });
 
-  //Register
-  const formRegister = useForm({
+  const registerForm = useForm({
     resolver: zodResolver(userRegisterSchema),
     defaultValues: initialUserForm,
   });
 
-  // 2. Define a submit handler.
-  const onSubmit = (data) => {
+  // 2. Define a submit handler for login and register.
+  const onLoginSubmit = async (data) => {
     console.log('login_data: ', data);
-    // Implementación  del login
-    handlerLogin({
-      username: form.getValues().username,
-      password: form.getValues().password,
-    });
-    form.reset();
+    // Implementación del login
+    try {
+      await handlerLogin({
+        username: loginForm.getValues().username,
+        password: loginForm.getValues().password,
+      });
+
+      if (login.isAuth) {
+        const termsStatus = await getCheckUserTermsStatus(login.user.username);
+        if (!termsStatus || !termsStatus.accepted) {
+          getLatestTerms();
+          setShowTerms(true);
+        } else{
+          navigate('/users');
+        }
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Error de inicio de sesión: ' + error.message,
+        variant: 'destructive',
+      });
+    }
+    loginForm.reset();
   };
 
-  const onSubmitRegister = async (data) => {
+  const onRegisterSubmit = async (data) => {
     try {
-      handlerRegisterUser(data);
-      //const user = handlerRegisterUser(data);
-      // if (data.acceptTerms) {
-      //   await getRecordTermsInteraction(user.id, true, '127.0.0.1');  // Use actual IP in production
-      // }
+      console.log('register_data: ', data);
+      if (!data.acceptTerms) {
+        toast({
+          title: 'Error',
+          description: 'Debe aceptar los Términos y Condiciones para registrarse.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const user = await handlerRegisterUser(data);
+      console.log('User returned from handlerRegisterUser:', user); // Añade esta línea test
+      
+      if (data.acceptTerms) {
+        const ipAddress = await fetch('https://api.ipify.org?format=json')
+          .then(response => response.json())
+          .then(data => data.ip);
+        //await getRecordTermsInteraction(user.id, true, '127.0.0.1');  // Use actual IP in production
+        await getRecordTermsInteraction(user.id, true, ipAddress);
+      }
+
       toast({
         title: 'Success',
-        description: 'Usuario creada con éxito!',
+        description: 'Usuario creado con éxito!',
       });
-      formRegister.reset();
-      
+      registerForm.reset();
+      navigate('/login');
+
     } catch (error) {
       console.error(error);
+      toast({
+        title: 'Error',
+        description: 'Hubo un problema al registrar el usuario.',
+        variant: 'destructive',
+      });
     }
     // console.log('register_data: ', data);
     // handlerRegisterUser(data);
-    // formRegister.reset();
+    // registerForm.reset();
   };
 
   //redirigir Tab login or register
@@ -148,9 +193,29 @@ function LoginPage() {
     navigate(value === 'account' ? '/login' : '/register');
   };
 
+  //Aceptación de servicios
+  const handleAcceptTerms = async () => {
+    try {
+      const ipAddress = await fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => data.ip);
+      await getRecordTermsInteraction(login.user.username, true, ipAddress);
+      setShowTerms(false);
+      navigate('/users');  // Asumiendo que '/users' es tu ruta de dashboard
+    } catch (error) {
+      console.error('Error al aceptar los términos:', error);
+      toast({
+        title: 'Error',
+        description: 'Hubo un problema al aceptar los términos y condiciones.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   //account and register
   useEffect(() => {
     setSelected(location.pathname === '/login' ? 'account' : 'register');
+    getLatestTerms(); //test
   }, [location.pathname]);
 
   //Terms
@@ -247,11 +312,11 @@ function LoginPage() {
 
               <Form
                 className='flex flex-col'
-                {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)}>
                   <CardContent className='space-y-2'>
                     <FormField
-                      control={form.control}
+                      control={loginForm.control}
                       name='username'
                       className='space-y-1'
                       render={({ field }) => (
@@ -268,7 +333,7 @@ function LoginPage() {
                       )}
                     />
                     <FormField
-                      control={form.control}
+                      control={loginForm.control}
                       name='password'
                       className='space-y-1'
                       render={({ field }) => (
@@ -311,13 +376,13 @@ function LoginPage() {
 
               <Form
                 className='flex flex-col'
-                {...formRegister}>
+                {...registerForm}>
                 <form
-                  onSubmit={formRegister.handleSubmit(onSubmitRegister)}>
+                  onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
 
                   <CardContent className='space-y-2'>
                     <FormField
-                      control={formRegister.control}
+                      control={registerForm.control}
                       name='username'
                       className='space-y-1'
                       render={({ field }) => (
@@ -335,7 +400,7 @@ function LoginPage() {
                     />
                     
                     <FormField
-                      control={formRegister.control}
+                      control={registerForm.control}
                       name='password'
                       className='space-y-1'
                       render={({ field }) => (
@@ -355,7 +420,7 @@ function LoginPage() {
                     />
 
                     <FormField
-                      control={formRegister.control}
+                      control={registerForm.control}
                       name='email'
                       className='space-y-1'
                       render={({ field }) => (
@@ -373,7 +438,7 @@ function LoginPage() {
                     />
 
                     <FormField
-                      control={formRegister.control}
+                      control={registerForm.control}
                       name='id'
                       render={({ field }) => (
                         <FormItem>
@@ -385,27 +450,26 @@ function LoginPage() {
                     />
 
                     <FormField
-                      control={formRegister.control}
+                      control={registerForm.control}
                       name='acceptTerms'
                       render={({ field }) => (
                         <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className='space-y-1 leading-none'>
-                            <FormLabel>
-                              Aceptar t&eacute;rminos y condiciones
-                            </FormLabel>
-                            <FormDescription>
-                              Aceptas nuestros Términos de servicio y Política de privacidad.
-                              {/* {latestTerms ? latestTerms.content : 'No hay términos disponibles'} */}
-                              <Link className='font-medium' href='/termsAcceptance'>
-                                T&eacute;rminos y Condiciones
-                              </Link> .
-                            </FormDescription>
+                          <div className=' flex flex-col space-y-2 leading-none'>
+                            <FormLabel>Términos y Condiciones.</FormLabel>
+                            <Button className='w-auto' variant='link' onClick={() => setShowTerms(true)}>
+                              Ver Términos y Condiciones
+                            </Button>
+                            <div className='flex flex-row space-x-2 leading-none'>
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Aceptar Términos de servicio y Política de privacidad.
+                              </FormDescription>
+                            </div>
                           </div>
                         </FormItem>
                       )}
@@ -428,6 +492,22 @@ function LoginPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={showTerms} onOpenChange={setShowTerms}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Términos y Condiciones</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            {latestTerm ? latestTerm.content : 'Cargando términos...'}
+          </DialogDescription>
+          <DialogFooter>
+            <Button onClick={handleAcceptTerms}>Aceptar</Button>
+            <Button onClick={() => setShowTerms(false)} variant='outline'>Cerrar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </Layout>
   );
 }

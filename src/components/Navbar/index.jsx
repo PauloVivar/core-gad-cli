@@ -169,7 +169,7 @@ const Navbar = () => {
                       }
                       >
                       <PresentationChartBarIcon className='h-4 w-4' />
-                      Téminos y Codiciones{' '}
+                      T&eacute;rminos y Codiciones{' '}
                     </NavLink>
                   </>
                 }
@@ -188,7 +188,7 @@ const Navbar = () => {
 
       {/* Navbar Horizontal */}
       <div className='flex flex-col'>
-        <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 sticky top-0 z-10'>
+        <header className='flex h-14 items-center gap-4 border-b bg-muted px-4 lg:h-[60px] lg:px-6 sticky top-0 z-10'>
           <Sheet>
             <SheetTrigger asChild>
               <Button

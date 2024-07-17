@@ -218,13 +218,13 @@ const useUsers = () => {
     errors,
     isLoading,
     paginator,
+    getUsers,
     handlerRegisterUser,
     handlerAddUser,
     handlerDeleteUser,
     handlerSelectedUserForm,
     handlerOpenForm,
     handlerCloseForm,
-    getUsers,
   };
 };
 
