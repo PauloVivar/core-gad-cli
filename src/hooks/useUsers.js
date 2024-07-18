@@ -60,19 +60,25 @@ const useUsers = () => {
   };
 
   const handlerRegisterUser = async (user) => {
-    let response;
+    //let response;
     try {
-      response = await save(user);
-      dispatch(addUser(response.data));
+      const response = await save(user);
+      if (response && response.data) {
+        dispatch(addUser(response.data));
 
-      Swal.fire({
-        title: 'Usuario creado!',
-        text: 'Usuario creado con éxito',
-        icon: 'success',
-      });
+        Swal.fire({
+          title: 'Usuario creado!',
+          text: 'Usuario creado con éxito',
+          icon: 'success',
+        });
+  
+        //Redirigir a login
+        navigate('/login');
 
-      //Redirigir a login
-      navigate('/login');
+        return response.data;          // Asegúrar de que esto incluya el ID del usuario
+      } else {
+        throw new Error('La respuesta del servidor no contiene datos del usuario');
+      }
 
     } catch (error) {
       if (error.response && error.response.status == 400) {
@@ -93,7 +99,7 @@ const useUsers = () => {
             dispatch(loadingError({ email: 'El email ya existe' }));
           }
       } else {
-        //console.log('test_register_pv!!!')
+        console.error('Error al registrar usuario:', error);
         throw error;
       }
     }

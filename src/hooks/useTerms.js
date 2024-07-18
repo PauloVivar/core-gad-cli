@@ -7,9 +7,9 @@ import {
   findAll, 
   remove, 
   save, 
-  update, 
-  findLatestTerm,
+  update,
 
+  findLatestTerm,
   checkUserTermsStatus,
   recordTermsInteraction,
 } from '@/services/termsService';
@@ -26,7 +26,12 @@ import {
   fetchLatestTermStart,
   fetchLatestTermSuccess,
   fetchLatestTermError,
+
   setUserTermsStatus,
+  recordTermsInteractionStart,
+  recordTermsInteractionSuccess,
+  recordTermsInteractionError,
+
   loadingError,
 } from '@/store/slices/terms/termsSlice';
 
@@ -47,7 +52,10 @@ const useTerms = () => {
 
     latestTerm,
     latestTermError,
+
     userTermsStatus,
+    recordingTermsInteraction,
+    recordTermsInteractionError,
     isLoading,
   } = useSelector((state) => state.terms);
 
@@ -166,7 +174,6 @@ const useTerms = () => {
           dispatch(fetchLatestTermError('No se encontraron términos recientes.'));
         }
       } catch (error) {
-        console.error('Error al obtener el último término:', error);
         dispatch(fetchLatestTermError('Hubo un error al obtener el último término. Por favor, intente de nuevo.'));
       }
     }else {
@@ -187,10 +194,17 @@ const useTerms = () => {
   // Función asíncrona para registrar la interacción de términos
   const getRecordTermsInteraction = async (userId, accepted, ipAddress) => {
     try {
+      dispatch(recordTermsInteractionStart());
       const result = await recordTermsInteraction(userId, accepted, ipAddress);
-      dispatch(checkUserTermsStatus(result.userId));
+      dispatch(recordTermsInteractionSuccess(result.data));
+      dispatch(setUserTermsStatus(result.data));
     } catch (error) {
-      dispatch(loadingError(error.message));
+      dispatch(recordTermsInteractionError(error.message));
+      Swal.fire({
+        title: 'Error',
+        text: 'Hubo un problema al registrar la interacción con los términos.',
+        icon: 'error',
+      });
     }
   };
 
@@ -203,6 +217,8 @@ const useTerms = () => {
     latestTerm,
     latestTermError,
     userTermsStatus,
+    recordingTermsInteraction,
+    recordTermsInteractionError,
     isLoading,
 
     showLatestTerm,
@@ -214,8 +230,8 @@ const useTerms = () => {
     handlerSelectedTermForm,
     handlerOpenForm,
     handlerCloseForm,
+
     getLatestTerms,
-    
     getCheckUserTermsStatus,
     getRecordTermsInteraction,
   };

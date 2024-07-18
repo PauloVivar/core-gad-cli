@@ -22,9 +22,12 @@ export const termsSlice = createSlice({
     visibleForm: false,
     errors: initialErrors,
 
-    latestTerm: null,             //último término
+    latestTerm: null,                    //último término
     latestTermError: null,
-    userTermsStatus: null,         //status del término
+    
+    userTermsStatus: null,               //status del término
+    recordingTermsInteraction: false,    //grabar estado de la interacción
+    recordTermsInteractionError: null,
     isLoading: true,
   },
   reducers: {
@@ -81,6 +84,7 @@ export const termsSlice = createSlice({
       state.termSelected= initialTermForm;
     },
 
+    //últimos terms
     fetchLatestTermStart(state) {
       state.isLoading = true;
       state.latestTermError = null;
@@ -88,7 +92,6 @@ export const termsSlice = createSlice({
     fetchLatestTermSuccess(state, action) {
       const newLatestTerm = action.payload;
       state.latestTerm = newLatestTerm;
-      
       // Sincronizar con el array de términos
       const existingTermIndex = state.terms.findIndex(term => term.id === newLatestTerm.id);
       if (existingTermIndex !== -1) {
@@ -98,9 +101,7 @@ export const termsSlice = createSlice({
         // Agregar el nuevo término al principio del array
         state.terms.unshift(newLatestTerm);
       }
-      
       state.isLoading = false;
-
       //old
       //state.latestTerm = action.payload;
       //state.isLoading = false;
@@ -110,10 +111,24 @@ export const termsSlice = createSlice({
       state.isLoading = false;
     },
 
+    //interacciones user y terms
     setUserTermsStatus(state, action) {
       state.userTermsStatus = action.payload;
     },
+    recordTermsInteractionStart: (state) => {
+      state.recordingTermsInteraction = true;
+      state.recordTermsInteractionError = null;
+    },
+    recordTermsInteractionSuccess: (state, action) => {
+      state.recordingTermsInteraction = false;
+      state.userTermsStatus = action.payload;
+    },
+    recordTermsInteractionError: (state, action) => {
+      state.recordingTermsInteraction = false;
+      state.recordTermsInteractionError = action.payload;
+    },
 
+    //error de terms
     loadingError: (state, action) => {
       state.errors = action.payload;
       //state.isLoading = false;
@@ -133,6 +148,11 @@ export const {
   fetchLatestTermStart,
   fetchLatestTermSuccess,
   fetchLatestTermError,
+
   setUserTermsStatus,
+  recordTermsInteractionStart,
+  recordTermsInteractionSuccess,
+  recordTermsInteractionError,
+
   loadingError,
 } = termsSlice.actions;

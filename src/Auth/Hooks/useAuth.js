@@ -12,7 +12,6 @@ function useAuth() {
   const navigate = useNavigate();
 
   const handlerLogin = async ({ username, password }) => {
-
     try {
       dispatch(onInitLoading());
       const response = await loginUser({ username, password });
@@ -22,7 +21,10 @@ function useAuth() {
 
       //3 formas de obtener el username de token:
       //1.- response.data.username  2.- claims.username  3.- claims.sub (del payload de jwt)
-      const user = { username: claims.sub };
+      const user = {
+        id: claims.userId,              //backend incluye userId en el token
+        username: claims.sub 
+      };
       //const user = { username: 'admin' };
 
       dispatch(onLogin({ user, isAdmin: claims.isAdmin }));
@@ -35,7 +37,8 @@ function useAuth() {
         })
       );
       sessionStorage.setItem('token', `Bearer ${token}`);
-      navigate('/users');
+      return { isAuth: true, user };                 // test Devolvemos el objeto user con id y username
+      //navigate('/users');
 
     } catch(error) {
       dispatch(onLogout());

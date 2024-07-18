@@ -43,6 +43,7 @@ const remove = async (id) => {
   try {
     return await termsApi.delete(`${BASE_URL}/${id}`);
   } catch (error) {
+    console.error('Error al eliminar el término:', error);
     throw error;
   }
 }
@@ -52,6 +53,7 @@ const findLatestTerm = async () => {
     const response = await termsApi.get(`${BASE_URL}/latest`);
     return response;
   } catch (error) {
+    console.error('Error al obtener el último término:', error);
     throw error;
   }
 }

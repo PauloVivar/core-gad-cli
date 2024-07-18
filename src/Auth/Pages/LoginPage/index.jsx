@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
@@ -115,25 +115,50 @@ function LoginPage() {
     defaultValues: initialUserForm,
   });
 
+  //maneja la aceptación de términos tanto para el registro como para el inicio de sesión.
+  const handleTermsAcceptance = async (userId, accepted) => {
+    try {
+      const ipAddress = await fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => data.ip);
+      await getRecordTermsInteraction(userId, accepted, ipAddress);
+      
+      if (accepted) {
+        toast({
+          title: 'Éxito',
+          description: 'Términos y condiciones aceptados.',
+        });
+      }
+    } catch (error) {
+      console.error('Error al procesar los términos:', error);
+      toast({
+        title: 'Error',
+        description: 'Hubo un problema al procesar los términos y condiciones.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // 2. Define a submit handler for login and register.
   const onLoginSubmit = async (data) => {
     console.log('login_data: ', data);
     // Implementación del login
     try {
-      await handlerLogin({
+      const loginResult = await handlerLogin({
         username: loginForm.getValues().username,
         password: loginForm.getValues().password,
       });
 
-      if (login.isAuth) {
-        const termsStatus = await getCheckUserTermsStatus(login.user.username);
+      if (loginResult.isAuth) {
+        const termsStatus = await getCheckUserTermsStatus(loginResult.user.id);
         if (!termsStatus || !termsStatus.accepted) {
-          getLatestTerms();
+          await getLatestTerms();
           setShowTerms(true);
-        } else{
-          navigate('/users');
-        }
+          //await handleTermsAcceptance(loginResult.user.id, true);
+        } 
+        navigate('/users');
       }
+
     } catch (error) {
       toast({
         title: 'Error',
@@ -156,29 +181,25 @@ function LoginPage() {
         return;
       }
 
-      const user = await handlerRegisterUser(data);
-      console.log('User returned from handlerRegisterUser:', user); // Añade esta línea test
-      
-      if (data.acceptTerms) {
-        const ipAddress = await fetch('https://api.ipify.org?format=json')
-          .then(response => response.json())
-          .then(data => data.ip);
-        //await getRecordTermsInteraction(user.id, true, '127.0.0.1');  // Use actual IP in production
-        await getRecordTermsInteraction(user.id, true, ipAddress);
+      const result = await handlerRegisterUser(data); 
+      if (result && result.id) {
+        await handleTermsAcceptance(result.id, true);
+        toast({
+          title: 'Éxito',
+          description: 'Usuario creado con éxito!',
+        });
+        registerForm.reset();
+        navigate('/login');
+
+      }else {
+        throw new Error('No se pudo obtener el ID del usuario registrado');
       }
 
-      toast({
-        title: 'Success',
-        description: 'Usuario creado con éxito!',
-      });
-      registerForm.reset();
-      navigate('/login');
-
     } catch (error) {
-      console.error(error);
+      console.error('Error durante el registro:', error);
       toast({
         title: 'Error',
-        description: 'Hubo un problema al registrar el usuario.',
+        description: error.message || 'Hubo un problema al registrar el usuario.',
         variant: 'destructive',
       });
     }
@@ -187,21 +208,26 @@ function LoginPage() {
     // registerForm.reset();
   };
 
-  //redirigir Tab login or register
-  const handleTabChange = (value) => {
-    setSelected(value);
-    navigate(value === 'account' ? '/login' : '/register');
+  const handleViewTerms = () => {
+    getLatestTerms();
+    setShowTerms(true);
   };
 
-  //Aceptación de servicios
+  //aceptación de los nuevos términos y condiciones por parte de un usuario que ya ha iniciado sesión.
   const handleAcceptTerms = async () => {
+    if (!login.user || !login.user.id) {
+      toast({
+        title: 'Error',
+        description: 'No se pudo identificar al usuario. Por favor, intente iniciar sesión nuevamente.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
-      const ipAddress = await fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => data.ip);
-      await getRecordTermsInteraction(login.user.username, true, ipAddress);
+      await handleTermsAcceptance(login.user.id, true);
       setShowTerms(false);
-      navigate('/users');  // Asumiendo que '/users' es tu ruta de dashboard
+      navigate('/users');
     } catch (error) {
       console.error('Error al aceptar los términos:', error);
       toast({
@@ -212,16 +238,16 @@ function LoginPage() {
     }
   };
 
+  //redirigir Tab login or register
+  const handleTabChange = (value) => {
+    setSelected(value);
+    navigate(value === 'account' ? '/login' : '/register');
+  };
+
   //account and register
   useEffect(() => {
     setSelected(location.pathname === '/login' ? 'account' : 'register');
-    getLatestTerms(); //test
   }, [location.pathname]);
-
-  //Terms
-  // useEffect(() => {
-  //   getLatestTerms();
-  // }, [getLatestTerms]);
 
   return (
     <Layout>
@@ -413,7 +439,7 @@ function LoginPage() {
                               {...field}
                             />
                           </FormControl>
-                          <FormDescription>Ingrese una contraseña segura</FormDescription>
+                          <FormDescription>Ejemplo de una contraseña segura: !d8Jqz7@f4R$1P</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -454,22 +480,22 @@ function LoginPage() {
                       name='acceptTerms'
                       render={({ field }) => (
                         <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                          <div className=' flex flex-col space-y-2 leading-none'>
-                            <FormLabel>Términos y Condiciones.</FormLabel>
-                            <Button className='w-auto' variant='link' onClick={() => setShowTerms(true)}>
-                              Ver Términos y Condiciones
-                            </Button>
-                            <div className='flex flex-row space-x-2 leading-none'>
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Aceptar Términos de servicio y Política de privacidad.
-                              </FormDescription>
-                            </div>
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Términos de servicio y Política de privacidad.
+                            </FormLabel>
+                            <FormDescription>
+                              Acepto{" "}
+                              <Link className='font-semibold underline' onClick={handleViewTerms}>Términos y Condiciones</Link>
+                              {" "}del servico.
+                            </FormDescription>
+                            <FormMessage />
                           </div>
                         </FormItem>
                       )}
