@@ -22,11 +22,11 @@ export const termsSlice = createSlice({
     visibleForm: false,
     errors: initialErrors,
 
-    latestTerm: null,                    //último término
+    latestTerm: null,                       //último término
     latestTermError: null,
     
-    userTermsStatus: null,               //status del término
-    recordingTermsInteraction: false,    //grabar estado de la interacción
+    userTermsStatus: null,                  //status del término
+    recordingTermsInteraction: false,       //grabar estado de la interacción
     recordingTermsInteractionError: null,
     isLoading: true,
   },
@@ -40,7 +40,7 @@ export const termsSlice = createSlice({
       // ];
       const newTerm = action.payload;
       state.terms.unshift(newTerm);
-      state.latestTerm = newTerm;          // Actualizar latestTerm
+      state.latestTerm = newTerm;           //actualizar latestTerm
 
       state.termSelected= initialTermForm;
       state.visibleForm= false;
@@ -62,7 +62,7 @@ export const termsSlice = createSlice({
         term.id === updatedTerm.id ? updatedTerm : term
       );
       if (state.latestTerm && state.latestTerm.id === updatedTerm.id) {
-        state.latestTerm = updatedTerm; // Actualizar latestTerm si es necesario
+        state.latestTerm = updatedTerm;     //actualizar latestTerm si es necesario
       }
       
       state.termSelected= initialTermForm;
@@ -111,10 +111,12 @@ export const termsSlice = createSlice({
       state.isLoading = false;
     },
 
-    //interacciones user y terms
+    //verificar el estado de los términos del usuario
     setUserTermsStatus(state, action) {
       state.userTermsStatus = action.payload;
     },
+
+    //interacciones user y terms
     recordTermsInteractionStart: (state) => {
       state.recordingTermsInteraction = true;
       state.recordingTermsInteractionError = null;

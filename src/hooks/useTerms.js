@@ -172,16 +172,20 @@ const useTerms = () => {
   // Función asíncrona para checkear el estado de términos de usuario
   const getCheckUserTermsStatus = async (userId) => {
     try {
-      const result = await checkUserTermsStatus(userId);
+      const result = await checkUserTermsStatus({ userId });   //se pasa desestructurado ya que asúi recibe en termsService
       dispatch(setUserTermsStatus(result.data));
     } catch (error) {
-      console.error('Error checking user terms status:', error);
+      console.error('Error al comprobar el estado de los términos de usuario:', error);
       dispatch(loadingError(error.message));
     }
   };
 
   // Función asíncrona para registrar la interacción de términos
   const getRecordTermsInteraction = async (userId, accepted, ipAddress) => {
+    console.log('test5', userId);
+    console.log('test6', accepted);
+    console.log('test7', ipAddress);
+
     dispatch(recordTermsInteractionStart());
     try {
       const result = await recordTermsInteraction(userId, accepted, ipAddress);

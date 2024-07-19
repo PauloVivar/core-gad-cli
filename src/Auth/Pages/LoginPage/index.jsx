@@ -96,7 +96,10 @@ function LoginPage() {
 
   //Context useTerms Global Redux.
   const { 
-    latestTerm, 
+    latestTerm,
+    latestTermError,
+    userTermsStatus,
+    recordingTermsInteractionError,
     getLatestTerms,
     getCheckUserTermsStatus, 
     getRecordTermsInteraction,
@@ -115,14 +118,18 @@ function LoginPage() {
     defaultValues: initialUserForm,
   });
 
-  //maneja la aceptación de términos tanto para el registro como para el inicio de sesión.
+  //maneja la aceptación de términos tanto para el registro como para el inicio de sesión. TermsInteractionDTO
   const handleTermsAcceptance = async (userId, accepted) => {
+    console.log('test2: ', userId);
+    console.log('test3: ', accepted);
     try {
       const ipAddress = await fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => data.ip);
-      await getRecordTermsInteraction(userId, accepted, ipAddress);
+      .then(response => response.json())
+      .then(data => data.ip);
       
+      console.log('test4: ', ipAddress);
+      await getRecordTermsInteraction(userId, accepted, ipAddress);
+
       if (accepted) {
         toast({
           title: 'Éxito',
@@ -133,7 +140,7 @@ function LoginPage() {
       console.error('Error al procesar los términos:', error);
       toast({
         title: 'Error',
-        description: 'Hubo un problema al procesar los términos y condiciones.',
+        description: `Hubo un problema al procesar los términos y condiciones: ${recordingTermsInteractionError}`,
         variant: 'destructive',
       });
     }
@@ -154,7 +161,6 @@ function LoginPage() {
         if (!termsStatus || !termsStatus.accepted) {
           await getLatestTerms();
           setShowTerms(true);
-          //await handleTermsAcceptance(loginResult.user.id, true);
         } 
         navigate('/users');
       }
@@ -184,6 +190,7 @@ function LoginPage() {
       const result = await handlerRegisterUser(data); 
       if (result && result.id) {
         await handleTermsAcceptance(result.id, true);
+        console.log('test1', result.id);
         toast({
           title: 'Éxito',
           description: 'Usuario creado con éxito!',
@@ -209,8 +216,16 @@ function LoginPage() {
   };
 
   const handleViewTerms = () => {
-    getLatestTerms();
-    setShowTerms(true);
+    try {
+      getLatestTerms();
+      setShowTerms(true);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: `No se pudieron cargar los términos más recientes: ${latestTermError}`,
+        variant: 'destructive',
+      });
+    }
   };
 
   //aceptación de los nuevos términos y condiciones por parte de un usuario que ya ha iniciado sesión.
