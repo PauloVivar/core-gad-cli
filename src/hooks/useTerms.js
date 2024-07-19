@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '@/auth/hooks/useAuth';
@@ -55,13 +54,11 @@ const useTerms = () => {
 
     userTermsStatus,
     recordingTermsInteraction,
-    recordTermsInteractionError,
+    recordingTermsInteractionError,
     isLoading,
   } = useSelector((state) => state.terms);
 
   const dispatch = useDispatch();
-
-  const [showLatestTerm, setShowLatestTerm] = useState(false);
 
   const getTerms = async () => {
     try {
@@ -84,7 +81,7 @@ const useTerms = () => {
       } else {
         response = await update(term);
         dispatch(updateTerm(response.data));
-      };
+      }
 
       term.id === 0
         ? Swal.fire({
@@ -163,21 +160,12 @@ const useTerms = () => {
 
   // Función asíncrona para obtener los últimos términos
   const getLatestTerms = async () => {
-    if (!showLatestTerm && !latestTerm) {
-      dispatch(fetchLatestTermStart());
-      try {
-        const result = await findLatestTerm();
-        if (result && result.data) {
-          dispatch(fetchLatestTermSuccess(result.data));
-          setShowLatestTerm(true);
-        }else{
-          dispatch(fetchLatestTermError('No se encontraron términos recientes.'));
-        }
-      } catch (error) {
-        dispatch(fetchLatestTermError('Hubo un error al obtener el último término. Por favor, intente de nuevo.'));
-      }
-    }else {
-      setShowLatestTerm(!showLatestTerm);
+    dispatch(fetchLatestTermStart());
+    try {
+      const result = await findLatestTerm();
+      dispatch(fetchLatestTermSuccess(result.data));
+    } catch (error) {
+      dispatch(fetchLatestTermError(error.message));
     }
   };
 
@@ -187,24 +175,20 @@ const useTerms = () => {
       const result = await checkUserTermsStatus(userId);
       dispatch(setUserTermsStatus(result.data));
     } catch (error) {
+      console.error('Error checking user terms status:', error);
       dispatch(loadingError(error.message));
     }
   };
 
   // Función asíncrona para registrar la interacción de términos
   const getRecordTermsInteraction = async (userId, accepted, ipAddress) => {
+    dispatch(recordTermsInteractionStart());
     try {
-      dispatch(recordTermsInteractionStart());
       const result = await recordTermsInteraction(userId, accepted, ipAddress);
       dispatch(recordTermsInteractionSuccess(result.data));
-      dispatch(setUserTermsStatus(result.data));
     } catch (error) {
       dispatch(recordTermsInteractionError(error.message));
-      Swal.fire({
-        title: 'Error',
-        text: 'Hubo un problema al registrar la interacción con los términos.',
-        icon: 'error',
-      });
+      throw error;
     }
   };
 
@@ -218,11 +202,8 @@ const useTerms = () => {
     latestTermError,
     userTermsStatus,
     recordingTermsInteraction,
-    recordTermsInteractionError,
+    recordingTermsInteractionError,
     isLoading,
-
-    showLatestTerm,
-    setShowLatestTerm,
     
     getTerms,
     handlerAddTerm,

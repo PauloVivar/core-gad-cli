@@ -27,7 +27,7 @@ export const termsSlice = createSlice({
     
     userTermsStatus: null,               //status del término
     recordingTermsInteraction: false,    //grabar estado de la interacción
-    recordTermsInteractionError: null,
+    recordingTermsInteractionError: null,
     isLoading: true,
   },
   reducers: {
@@ -117,7 +117,7 @@ export const termsSlice = createSlice({
     },
     recordTermsInteractionStart: (state) => {
       state.recordingTermsInteraction = true;
-      state.recordTermsInteractionError = null;
+      state.recordingTermsInteractionError = null;
     },
     recordTermsInteractionSuccess: (state, action) => {
       state.recordingTermsInteraction = false;
@@ -125,7 +125,7 @@ export const termsSlice = createSlice({
     },
     recordTermsInteractionError: (state, action) => {
       state.recordingTermsInteraction = false;
-      state.recordTermsInteractionError = action.payload;
+      state.recordingTermsInteractionError = action.payload;
     },
 
     //error de terms

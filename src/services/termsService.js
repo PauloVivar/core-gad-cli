@@ -8,6 +8,7 @@ const findAll = async () => {
     const response = await termsApi.get(BASE_URL);
     return response;
   } catch (error) {
+    console.error(error);
     throw error;
   }
 }

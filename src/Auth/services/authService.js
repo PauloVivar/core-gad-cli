@@ -9,6 +9,7 @@ const loginUser = async ({ username, password }) => {
       password,
     });
   } catch (error) {
+    console.error(error);
     throw error;
   }
   //return userLogin.username === 'admin' && userLogin.password === '12345' ? true : false;

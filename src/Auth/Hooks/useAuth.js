@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../services/authService';
 import { onLogin, onLogout, onInitLoading } from '@/store/slices/auth/authSlice';
@@ -9,7 +9,7 @@ function useAuth() {
   const dispatch = useDispatch();
   const { user, isAdmin, isAuth, isLoginLoading } = useSelector(state => state.auth);
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const handlerLogin = async ({ username, password }) => {
     try {
@@ -17,7 +17,7 @@ function useAuth() {
       const response = await loginUser({ username, password });
       const token = response.data.token;
       const claims = JSON.parse(window.atob(token.split('.')[1]));  //atob -> decodificar base64
-      //console.log(claims);
+      console.log(claims);
 
       //3 formas de obtener el username de token:
       //1.- response.data.username  2.- claims.username  3.- claims.sub (del payload de jwt)
@@ -57,6 +57,7 @@ function useAuth() {
       }else{
         throw error;
       }
+      return { isAuth: false, user: null };    //test
     }
   };
 

@@ -18,7 +18,7 @@ export const authSlice = createSlice ({
       state.user = action.payload.user;
       state.isLoginLoading = false;
     },
-    onLogout: (state, action) => {
+    onLogout: (state) => {
       state.isAuth = false;
       state.isAdmin = false;
       state.user = undefined;

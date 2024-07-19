@@ -258,60 +258,60 @@ function LoginPage() {
             <AccordionContent>
               <ul className='space-y-2'>
                 <li className='flex items-center'>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Seleccione el tipo de persona.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Ingrese su documento de identidad y la información que se le solicita.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Acepte el acceso a la información.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Presione el botón validar.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Confirme el captcha de seguridad.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Complete los campos requeridos (*).
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Acepte el acuerdo de responsabilidad (*).
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Presione el botón Aceptar y continuar.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Para la activación del usuario debe firmar el acuerdo de responsabilidad, 
                   si es persona jurídica el acuerdo debe ser firmado por el representante legal.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Escoja si la firma es electrónica (archivo p12) o firma manuscrita.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Si la firma es electrónica, presione el botón Firmar Acuerdo y proceda a seleccionar 
                   zona de firma, escoger el archivo p12 e ingresar la contraseña de su firma.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Si la firma es manuscrita, presione el botón Descargar Acuerdo, el mismo que deberá 
                   ser impreso y firmado. A continuación debe escanear el acuerdo y subirlo en la sección 
                   Adjuntar Acuerdo. Para la verificación de identidad debe adjuntar una fotografía (tipo selfie) 
                   con su documento de identidad.
                 </li>
                 <li>
-                  <span class='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
+                  <span className='w-2.5 h-2.5 bg-slate-600 rounded-full inline-block mr-3'></span>
                   Presione el botón Finalizar, si firmó electrónicamente, el usuario será activado de 
                   forma automática. Caso contrario, será activado hasta en 1 día hábil.
                 </li>
