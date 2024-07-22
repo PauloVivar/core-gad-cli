@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Alert, AlertDescription } from '../ui/alert';
 import { CircleAlert } from 'lucide-react';
+import { TermsAcceptanceModal } from '../TermsAcceptanceModal';
 
 const Layout = ({ children }) => {
 
@@ -19,6 +20,7 @@ const Layout = ({ children }) => {
         <main className='flex flex-1 flex-col gap-4 m-2 p-2 lg:gap-6'>
           
           {children}
+          <TermsAcceptanceModal />
         
         </main>
       </div>

@@ -59,7 +59,7 @@ const userLoginSchema = z.object({
 
 //Validation Schema Register
 const userRegisterSchema = z.object({
-  id: z.number(),
+  //id: z.number(),
   username: z.string().min(1, {
     message: 'El username es requerido.',
   }),
@@ -70,7 +70,7 @@ const userRegisterSchema = z.object({
     message: 'Ingrese un email válido.',
   }),
   admin: z.boolean().default(false).optional(),
-  acceptTerms: z.boolean().refine(val => val === true, {
+  acceptedTerms: z.boolean().refine(val => val === true, {
     message: 'Debe aceptar los Términos y Condiciones.',
   }),
 });
@@ -118,18 +118,10 @@ function LoginPage() {
     defaultValues: initialUserForm,
   });
 
-  //maneja la aceptación de términos tanto para el registro como para el inicio de sesión. TermsInteractionDTO
+  //maneja la aceptación de términos para el registro. TermsInteractionDTO
   const handleTermsAcceptance = async (userId, accepted) => {
-    console.log('test2: ', userId);
-    console.log('test3: ', accepted);
     try {
-      const ipAddress = await fetch('https://api.ipify.org?format=json')
-      .then(response => response.json())
-      .then(data => data.ip);
-      
-      console.log('test4: ', ipAddress);
-      await getRecordTermsInteraction(userId, accepted, ipAddress);
-
+      await getRecordTermsInteraction(userId, accepted);
       if (accepted) {
         toast({
           title: 'Éxito',
@@ -178,7 +170,7 @@ function LoginPage() {
   const onRegisterSubmit = async (data) => {
     try {
       console.log('register_data: ', data);
-      if (!data.acceptTerms) {
+      if (!data.acceptedTerms) {
         toast({
           title: 'Error',
           description: 'Debe aceptar los Términos y Condiciones para registrarse.',
@@ -190,7 +182,6 @@ function LoginPage() {
       const result = await handlerRegisterUser(data); 
       if (result && result.id) {
         await handleTermsAcceptance(result.id, true);
-        console.log('test1', result.id);
         toast({
           title: 'Éxito',
           description: 'Usuario creado con éxito!',
@@ -229,29 +220,29 @@ function LoginPage() {
   };
 
   //aceptación de los nuevos términos y condiciones por parte de un usuario que ya ha iniciado sesión.
-  const handleAcceptTerms = async () => {
-    if (!login.user || !login.user.id) {
-      toast({
-        title: 'Error',
-        description: 'No se pudo identificar al usuario. Por favor, intente iniciar sesión nuevamente.',
-        variant: 'destructive',
-      });
-      return;
-    }
+  // const handleAcceptTerms = async () => {
+  //   if (!login.user || !login.user.id) {
+  //     toast({
+  //       title: 'Error',
+  //       description: 'No se pudo identificar al usuario. Por favor, intente iniciar sesión nuevamente.',
+  //       variant: 'destructive',
+  //     });
+  //     return;
+  //   }
 
-    try {
-      await handleTermsAcceptance(login.user.id, true);
-      setShowTerms(false);
-      navigate('/users');
-    } catch (error) {
-      console.error('Error al aceptar los términos:', error);
-      toast({
-        title: 'Error',
-        description: 'Hubo un problema al aceptar los términos y condiciones.',
-        variant: 'destructive',
-      });
-    }
-  };
+  //   try {
+  //     await handleTermsAcceptance(login.user.id, true);
+  //     setShowTerms(false);
+  //     navigate('/users');
+  //   } catch (error) {
+  //     console.error('Error al aceptar los términos:', error);
+  //     toast({
+  //       title: 'Error',
+  //       description: 'Hubo un problema al aceptar los términos y condiciones.',
+  //       variant: 'destructive',
+  //     });
+  //   }
+  // };
 
   //redirigir Tab login or register
   const handleTabChange = (value) => {
@@ -480,19 +471,7 @@ function LoginPage() {
 
                     <FormField
                       control={registerForm.control}
-                      name='id'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input type='hidden' {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={registerForm.control}
-                      name='acceptTerms'
+                      name='acceptedTerms'
                       render={({ field }) => (
                         <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
                           <FormControl>
@@ -543,7 +522,6 @@ function LoginPage() {
             {latestTerm ? latestTerm.content : 'Cargando términos...'}
           </DialogDescription>
           <DialogFooter>
-            <Button onClick={handleAcceptTerms}>Aceptar</Button>
             <Button onClick={() => setShowTerms(false)} variant='outline'>Cerrar</Button>
           </DialogFooter>
         </DialogContent>

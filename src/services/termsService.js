@@ -69,15 +69,13 @@ const checkUserTermsStatus = async ({ userId }) => {
   }
 };
 
-const recordTermsInteraction = async (userId, accepted, ipAddress) => {
+const recordTermsInteraction = async (userId, accepted) => {
   try {
     console.log('test8', userId);
     console.log('test9', accepted);
-    console.log('test10', ipAddress);
     return await termsApi.post(`${BASE_URL}/record`, { 
       userId, 
-      accepted, 
-      ipAddress,
+      accepted,
     });
   } catch (error) {
     console.error('Error service al registrar la interacción de términos:', error);

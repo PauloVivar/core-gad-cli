@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '@/auth/hooks/useAuth';
 
-import { findAllPages, remove, save, update } from '@/services/userService';
+import { findAllPages, remove, save, update, register } from '@/services/userService';
 import {
   initialUserForm,
   addUser,
@@ -62,7 +62,8 @@ const useUsers = () => {
   const handlerRegisterUser = async (user) => {
     //let response;
     try {
-      const response = await save(user);
+      const response = await register(user);
+      console.log('prueba: ', response.data);
       if (response && response.data) {
         dispatch(addUser(response.data));
 

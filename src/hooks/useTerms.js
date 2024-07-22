@@ -181,14 +181,10 @@ const useTerms = () => {
   };
 
   // Función asíncrona para registrar la interacción de términos
-  const getRecordTermsInteraction = async (userId, accepted, ipAddress) => {
-    console.log('test5', userId);
-    console.log('test6', accepted);
-    console.log('test7', ipAddress);
-
+  const getRecordTermsInteraction = async (userId, accepted) => {
     dispatch(recordTermsInteractionStart());
     try {
-      const result = await recordTermsInteraction(userId, accepted, ipAddress);
+      const result = await recordTermsInteraction(userId, accepted);
       dispatch(recordTermsInteractionSuccess(result.data));
     } catch (error) {
       dispatch(recordTermsInteractionError(error.message));

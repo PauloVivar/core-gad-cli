@@ -57,4 +57,19 @@ const remove = async (id) => {
   }
 }
 
-export { findAll, findAllPages, save, update, remove };
+const register = async ({ username, email, password, admin, acceptedTerms }) => {
+  try {
+    return await usersApi.post(`${BASE_URL}/registration`, {
+      username,
+      email,
+      password,
+      admin,
+      acceptedTerms,
+    });
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+    throw error;
+  }
+}
+
+export { findAll, findAllPages, save, update, remove, register };
