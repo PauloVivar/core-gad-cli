@@ -57,19 +57,65 @@ const remove = async (id) => {
   }
 }
 
-const register = async ({ username, email, password, admin, acceptedTerms }) => {
+// const register = async ({ username, email, password, admin, acceptedTerms }) => {
+//   try {
+//     return await usersApi.post(`${BASE_URL}/registration`, {
+//       username,
+//       email,
+//       password,
+//       admin,
+//       acceptedTerms,
+//     });
+//   } catch (error) {
+//     console.error('Error al registrar usuario:', error);
+//     throw error;
+//   }
+// }
+
+const register = async ({ 
+  username, 
+  password, 
+  email,
+  admin, 
+  acceptedTerms,
+
+  ci,
+  fullName,
+  address,
+  phone,
+  taxpayerCity,
+  houseNumber,
+  taxpayerType,
+  legalPerson,
+  identificationType,
+  birthdate,
+  maritalStatus
+}) => {
   try {
     return await usersApi.post(`${BASE_URL}/registration`, {
       username,
-      email,
       password,
+      email,
       admin,
       acceptedTerms,
+      
+      ci,
+      fullName,
+      address,
+      phone,
+      taxpayerCity,
+      houseNumber,
+      taxpayerType,
+      legalPerson,
+      identificationType,
+      birthdate,
+      maritalStatus
     });
   } catch (error) {
     console.error('Error al registrar usuario:', error);
     throw error;
   }
 }
+
 
 export { findAll, findAllPages, save, update, remove, register };

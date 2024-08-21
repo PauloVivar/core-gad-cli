@@ -46,6 +46,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { Layout } from '@/components/Layout';
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+import log_azo from '../../../assets/log_azo.png';
+
 //mod email
 //Validation Schema Login
 const userLoginSchema = z.object({
@@ -58,17 +78,40 @@ const userLoginSchema = z.object({
 });
 
 //Validation Schema Register
+// const userRegisterSchema = z.object({
+//   //id: z.number(),
+//   username: z.string().min(1, {
+//     message: 'El username es requerido.',
+//   }),
+//   password: z.string().min(5, {
+//     message: 'La contraseña de usuario debe tener al menos 5 caracteres.',
+//   }),
+//   email: z.string().email({
+//     message: 'Ingrese un email válido.',
+//   }),
+//   admin: z.boolean().default(false).optional(),
+//   acceptedTerms: z.boolean().refine(val => val === true, {
+//     message: 'Debe aceptar los Términos y Condiciones.',
+//   }),
+// });
+
 const userRegisterSchema = z.object({
-  //id: z.number(),
-  username: z.string().min(1, {
-    message: 'El username es requerido.',
+  ci: z.string().min(10, 'El documento de identidad debe tener al menos 10 a 13 caracteres'),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
+  email: z.string().email('Ingrese un email válido.'),
+
+  fullName: z.string().min(1, 'El nombre completo es requerido.'),
+  address: z.string().min(1, 'La dirección es requerida.'),
+  phone: z.string().min(9, 'El teléfono debe tener al menos 9 dígitos.'),
+  taxpayerCity: z.string().min(1, 'La ciudad es requerida.'),
+  houseNumber: z.string().min(1, 'El número de casa es requerido.'),
+  birthdate: z.date({
+    required_error: 'A date of birth is required.',
   }),
-  password: z.string().min(5, {
-    message: 'La contraseña de usuario debe tener al menos 5 caracteres.',
-  }),
-  email: z.string().email({
-    message: 'Ingrese un email válido.',
-  }),
+  taxpayerType: z.number().default(0),
+  legalPerson: z.number().default(44),
+  identificationType: z.number().default(33),
+  maritalStatus: z.number().default(37),
   admin: z.boolean().default(false).optional(),
   acceptedTerms: z.boolean().refine(val => val === true, {
     message: 'Debe aceptar los Términos y Condiciones.',
@@ -117,6 +160,7 @@ function LoginPage() {
     resolver: zodResolver(userRegisterSchema),
     defaultValues: initialUserForm,
   });
+  
 
   //maneja la aceptación de términos para el registro. TermsInteractionDTO
   const handleTermsAcceptance = async (userId, accepted) => {
@@ -179,7 +223,13 @@ function LoginPage() {
         return;
       }
 
-      const result = await handlerRegisterUser(data); 
+      // Asignar ci como username automáticamente
+      const registrationData = {
+        ...data,
+        username: data.ci
+      };
+
+      const result = await handlerRegisterUser(registrationData); 
       if (result && result.id) {
         await handleTermsAcceptance(result.id, true);
         toast({
@@ -218,31 +268,6 @@ function LoginPage() {
       });
     }
   };
-
-  //aceptación de los nuevos términos y condiciones por parte de un usuario que ya ha iniciado sesión.
-  // const handleAcceptTerms = async () => {
-  //   if (!login.user || !login.user.id) {
-  //     toast({
-  //       title: 'Error',
-  //       description: 'No se pudo identificar al usuario. Por favor, intente iniciar sesión nuevamente.',
-  //       variant: 'destructive',
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     await handleTermsAcceptance(login.user.id, true);
-  //     setShowTerms(false);
-  //     navigate('/users');
-  //   } catch (error) {
-  //     console.error('Error al aceptar los términos:', error);
-  //     toast({
-  //       title: 'Error',
-  //       description: 'Hubo un problema al aceptar los términos y condiciones.',
-  //       variant: 'destructive',
-  //     });
-  //   }
-  // };
 
   //redirigir Tab login or register
   const handleTabChange = (value) => {
@@ -330,7 +355,7 @@ function LoginPage() {
           value={selected}
           onValueChange={handleTabChange}
           //defaultValue='account'
-          className='w-[400px]'>
+          className='w-[600px]'>
           <TabsList className='grid w-full grid-cols-2'>
             <TabsTrigger value='account'>Account</TabsTrigger>
             <TabsTrigger value='register'>Register</TabsTrigger>
@@ -346,42 +371,49 @@ function LoginPage() {
                 className='flex flex-col'
                 {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(onLoginSubmit)}>
-                  <CardContent className='space-y-2'>
-                    <FormField
-                      control={loginForm.control}
-                      name='username'
-                      className='space-y-1'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder='Ingrese su username'
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={loginForm.control}
-                      name='password'
-                      className='space-y-1'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder='Ingrese su password'
-                              type='password'
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <CardContent className='flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6 p-8 pt-0'>
+                    <div className='w-full sm:w-3/10 flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300'>
+                      <img src={log_azo} className='max-h-40 max-w-full' alt="Logo"></img>
+                    </div>
+                    <div className='w-full sm:w-7/10 space-y-6'>
+                      <FormField
+                        control={loginForm.control}
+                        name='username'
+                        className='space-y-1'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Username</FormLabel>
+                            <FormControl>
+                              <Input
+                                //className='w-full'
+                                placeholder='Ingrese su cedula'
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={loginForm.control}
+                        name='password'
+                        className='space-y-1'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <Input
+                                //className='w-full'
+                                placeholder='Ingrese su password'
+                                type='password'
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </CardContent>
 
                   <CardFooter className='flex flex-col'>
@@ -406,27 +438,24 @@ function LoginPage() {
                 <CardDescription>Es rápido y facil.</CardDescription>
               </CardHeader>
 
-              <Form
-                className='flex flex-col'
-                {...registerForm}>
-                <form
-                  onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
+              <Form className='flex flex-col' {...registerForm}>
+                <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
 
                   <CardContent className='space-y-2'>
                     <FormField
                       control={registerForm.control}
-                      name='username'
+                      name='ci'
                       className='space-y-1'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Username</FormLabel>
+                          <FormLabel>Documento de Identidad</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder='Ingrese su username'
+                              placeholder='Ingrese su documento de identidad'
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage>{errors?.username}</FormMessage>
+                          <FormMessage>{errors?.ci}</FormMessage>
                         </FormItem>
                       )}
                     />
@@ -460,7 +489,7 @@ function LoginPage() {
                           <FormLabel>Email</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder='Ingres su email'
+                              placeholder='Ingrese su email'
                               {...field}
                             />
                           </FormControl>
@@ -468,6 +497,240 @@ function LoginPage() {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={registerForm.control}
+                      name='fullName'
+                      className='space-y-1'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nombre Completo</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder='Ingrese sus nombres y apellidos'
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    /> 
+
+                    <FormField
+                      control={registerForm.control}
+                      name='address'
+                      className='space-y-1'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Dirección</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder='Ingrese su dirección'
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className='flex flex-row w-full justify-center space-x-2'>
+                      <FormField
+                        control={registerForm.control}
+                        name='phone'
+                        className='space-y-1'
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Celular/ Teléfono</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder='Ingrese su celular o teléfono'
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={registerForm.control}
+                        name='taxpayerCity'
+                        className='space-y-1'
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Ciudad</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder='Ingrese la ciudad de residencia'
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className='flex flex-col sm:flex-row w-full justify-center space-y-4 sm:space-y-0 sm:space-x-4'>
+                      <FormField
+                        control={registerForm.control}
+                        name='houseNumber'
+                        render={({ field }) => (
+                          <FormItem className='w-full sm:w-1/2'>
+                            <FormLabel>Número de Casa</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder='Ingrese el número de su casa'
+                                className='w-full'
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={registerForm.control}
+                        name='birthdate'
+                        render={({ field }) => (
+                          <FormItem className='w-full sm:w-1/2'>
+                            <FormLabel>Fecha de Cumpleaños</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={'outline'}
+                                    className={cn(
+                                      'w-full h-10 px-3 text-left font-normal',
+                                      !field.value && 'text-muted-foreground'
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, 'PPP')
+                                    ) : (
+                                      <span>Seleccione una fecha</span>
+                                    )}
+                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className='w-auto p-0' align='start'>
+                                <Calendar
+                                  mode='single'
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) =>
+                                    date > new Date() || date < new Date('1900-01-01')
+                                  }
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <div className='flex flex-row w-full justify-center space-x-2'>
+                      <FormField
+                        control={registerForm.control}
+                        name='taxpayerType'
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Tipo de Contribuyente</FormLabel>
+                            <FormControl>
+                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Seleccione el tipo de contribuyente' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value='0'>NORMAL</SelectItem>
+                                  <SelectItem value='1'>PROVEEDOR</SelectItem>
+                                  <SelectItem value='2'>EMPLEADO</SelectItem>
+                                  <SelectItem value='3'>TRABAJADOR</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage>{errors?.taxpayerType}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={registerForm.control}
+                        name='legalPerson'
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Tipo de Persona</FormLabel>
+                            <FormControl>
+                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Seleccione el tipo de persona' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value='44'>PERSONA NATURAL</SelectItem>
+                                  <SelectItem value='45'>JURÍDICA DERECHO PÚBLICO</SelectItem>
+                                  <SelectItem value='46'>JURÍDICA DERECHO PRIVADO</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage>{errors?.legalPerson}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className='flex flex-row w-full justify-center space-x-2'>
+                      <FormField
+                        control={registerForm.control}
+                        name='identificationType'
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Tipo de Identificación</FormLabel>
+                            <FormControl>
+                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Seleccione el tipo de identificación' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value='33'>CÉDULA</SelectItem>
+                                  <SelectItem value='34'>PASAPORTE</SelectItem>
+                                  <SelectItem value='36'>RUC</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage>{errors?.identificationType}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={registerForm.control}
+                        name='maritalStatus'
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Estado Civil</FormLabel>
+                            <FormControl>
+                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Seleccione el estado civil' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value='37'>SOLTERO(A)</SelectItem>
+                                  <SelectItem value='38'>CASADO(A)</SelectItem>
+                                  <SelectItem value='39'>UNIÓN LIBRE</SelectItem>
+                                  <SelectItem value='40'>DIVORCIADO(A)</SelectItem>
+                                  <SelectItem value='41'>VIUDO(A)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage>{errors?.maritalStatus}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
                     <FormField
                       control={registerForm.control}
@@ -480,14 +743,14 @@ function LoginPage() {
                               onCheckedChange={field.onChange}
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
+                          <div className='space-y-1 leading-none'>
                             <FormLabel>
                               Términos de servicio y Política de privacidad.
                             </FormLabel>
                             <FormDescription>
-                              Acepto{" "}
+                              Acepto{' '}
                               <Link className='font-semibold underline' onClick={handleViewTerms}>Términos y Condiciones</Link>
-                              {" "}del servico.
+                              {' '}del servico.
                             </FormDescription>
                             <FormMessage />
                           </div>

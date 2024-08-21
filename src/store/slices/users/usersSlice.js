@@ -1,17 +1,38 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 //Se inicializa id=0 para seleccionar y update.
+// export const initialUserForm = {
+//   id: 0,
+//   username: '',
+//   email: '',
+//   password: '',
+//   admin: false,
+//   acceptedTerms: false, //test
+// };
+
 export const initialUserForm = {
   id: 0,
-  username: '',
-  email: '',
   password: '',
+  email: '',
+
+  ci: '',
+  fullName: '',
+  address: '',
+  phone: '',
+  taxpayerCity: '',
+  houseNumber: '',
+  taxpayerType: 0,
+  legalPerson: 44,
+  identificationType: 33,
+  birthdate: '',
+  maritalStatus: 37,
+
   admin: false,
-  acceptedTerms: false, //test
+  acceptedTerms: false,
 };
 
 const initialErrors = {
-  username: '',
+  ci: '',
   email: '',
   password: '',
 };

@@ -63,7 +63,7 @@ const useUsers = () => {
     //let response;
     try {
       const response = await register(user);
-      console.log('prueba: ', response.data);
+      console.log('respuesta del registro: ', response.data);
       if (response && response.data) {
         dispatch(addUser(response.data));
 
@@ -91,9 +91,9 @@ const useUsers = () => {
         error.response.status == 403 &&
         error.response.data?.message?.includes('constraint')
         ) {
-          if (error.response.data?.message?.includes('users_username_key')) {
-            console.log({username: 'El username ya existe'});
-            dispatch(loadingError({ username: 'El username ya existe' }));
+          if (error.response.data?.message?.includes('users_ci_key')) {
+            console.log({ci: 'El documento de identidad ya existe'});
+            dispatch(loadingError({ username: 'El documento de identidad ya existe' }));
           }
           if (error.response.data?.message?.includes('users_email_key')) {
             console.log({email: 'El email ya existe'});
