@@ -35,23 +35,19 @@ import {
 } from '@/store/slices/terms/termsSlice';
 
 import Swal from 'sweetalert2';
+import { useState } from 'react';
 
 const useTerms = () => {
-
-  const { handlerLogout } = useAuth();
-
-  const navigate = useNavigate();
-
   //Redux para CRUD en el Frond
   const { 
     terms,
     termSelected,
     visibleForm,
     errors,
-
+    
     latestTerm,
     latestTermError,
-
+    
     userTermsStatus,
     recordingTermsInteraction,
     recordingTermsInteractionError,
@@ -60,15 +56,21 @@ const useTerms = () => {
 
   const dispatch = useDispatch();
 
+  const { handlerLogout } = useAuth();
+  const navigate = useNavigate();
+
+  // Agregar estado para mostrar el último término en TermsPage()
+  const [showLatestTerm, setShowLatestTerm] = useState(false);
+
   const getTerms = async () => {
     try {
       const result = await findAll();
-      //console.log('list_t: ', result);
       dispatch(loadingTerms(result.data));
     } catch (error) {
       if (error.response?.status == 401) {
         handlerLogout();
       }
+      console.error('Error al obtener términos:', error);
     }
   };
 
@@ -101,13 +103,13 @@ const useTerms = () => {
       navigate('/terms');
 
     } catch (error) {
-      if (error.response && error.response.status == 400) {
+      if (error.response?.status === 400) {
         dispatch(loadingError(error.response.data));
-      } else if (error.response?.status == 401) {
+      } else if (error.response?.status === 401) {
         //console.error('no_autorizado:',error.response.data);
         handlerLogout();
       } else {
-        //console.log('pruebas pv');
+        console.error('Error al añadir/actualizar término:', error);
         throw error;
       }
     }
@@ -160,23 +162,36 @@ const useTerms = () => {
 
   // Función asíncrona para obtener los últimos términos
   const getLatestTerms = async () => {
-    dispatch(fetchLatestTermStart());
-    try {
-      const result = await findLatestTerm();
-      dispatch(fetchLatestTermSuccess(result.data));
-    } catch (error) {
-      dispatch(fetchLatestTermError(error.message));
+    setShowLatestTerm((prev) => !prev);
+    if (!showLatestTerm) {
+      dispatch(fetchLatestTermStart());
+      try {
+        const result = await findLatestTerm();
+        dispatch(fetchLatestTermSuccess(result.data));
+        console.log('getLatestTerms_data', result.data);
+        return result.data;
+      } catch (error) {
+        console.error('Error al obtener los últimos términos:', error);
+        dispatch(fetchLatestTermError(error.message));
+      }
     }
   };
 
   // Función asíncrona para checkear el estado de términos de usuario
   const getCheckUserTermsStatus = async (userId) => {
     try {
-      const result = await checkUserTermsStatus({ userId });   //se pasa desestructurado ya que asúi recibe en termsService
+      const result = await checkUserTermsStatus({ userId });   //se pasa desestructurado ya que así recibe en termsService
       dispatch(setUserTermsStatus(result.data));
+      //console.log('getCheckUserTermsStatus_data', result.data);   
+      return result.data;
+
     } catch (error) {
       console.error('Error al comprobar el estado de los términos de usuario:', error);
       dispatch(loadingError(error.message));
+      if (error.response?.status === 401) {
+        handlerLogout();
+      }
+      return false;
     }
   };
 
@@ -186,7 +201,10 @@ const useTerms = () => {
     try {
       const result = await recordTermsInteraction(userId, accepted);
       dispatch(recordTermsInteractionSuccess(result.data));
+      return result.data;
+
     } catch (error) {
+      console.error('Error al registrar la interacción de términos:', error);
       dispatch(recordTermsInteractionError(error.message));
       throw error;
     }
@@ -198,8 +216,12 @@ const useTerms = () => {
     termSelected,
     visibleForm,
     errors,
+
     latestTerm,
     latestTermError,
+
+    showLatestTerm,
+
     userTermsStatus,
     recordingTermsInteraction,
     recordingTermsInteractionError,

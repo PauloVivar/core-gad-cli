@@ -49,34 +49,87 @@ const remove = async (id) => {
   }
 }
 
+// Función para guardar en caché findLatestTerm y checkUserTermsStatus
+const setCacheItem = (key, value, ttl) => {
+  const item = {
+    value: value,
+    expiry: new Date().getTime() + ttl,
+  };
+  localStorage.setItem(key, JSON.stringify(item));
+};
+
+// Función para obtener de caché findLatestTerm y checkUserTermsStatus
+const getCacheItem = (key) => {
+  const itemStr = localStorage.getItem(key);
+  if (!itemStr) return null;
+
+  const item = JSON.parse(itemStr);
+  if (new Date().getTime() > item.expiry) {
+    localStorage.removeItem(key);
+    return null;
+  }
+  return item.value;
+};
+
+// Función para obtener los últimos términos con caché
 const findLatestTerm = async () => {
+  const cacheKey = 'latestTerms';
+  const cachedTerms = getCacheItem(cacheKey);
+
+  if (cachedTerms !== null) {
+    return { data: cachedTerms };
+  }
+
   try {
     const response = await termsApi.get(`${BASE_URL}/latest`);
+
+    // Cachear el resultado por 1 hora (3600000 ms)
+    setCacheItem(cacheKey, response.data, 3600000);
+    
     return response;
+
   } catch (error) {
     console.error('Error service al obtener el último término:', error);
     throw error;
   }
 }
 
+// Función para verificar el estado de los términos con caché
 const checkUserTermsStatus = async ({ userId }) => {
+  const cacheKey = `userTermsStatus_${userId}`;
+  const cachedStatus = getCacheItem(cacheKey);
+
+  if (cachedStatus !== null) {
+    return { data: cachedStatus };
+  }
+
   try {
     const response = await termsApi.get(`${BASE_URL}/status/${userId}`);
+    
+    // Cachear el resultado por 5 minutos (300000 ms)
+    setCacheItem(cacheKey, response.data, 300000);
+    
     return response;
+
   } catch (error) {
     console.error('Error service al comprobar el estado de los términos de usuario:', error);
     throw error;
   }
 };
 
+// Función para registrar la interacción de términos (sin caché)
 const recordTermsInteraction = async (userId, accepted) => {
   try {
-    console.log('test8', userId);
-    console.log('test9', accepted);
-    return await termsApi.post(`${BASE_URL}/record`, { 
+    const response = await termsApi.post(`${BASE_URL}/record`, { 
       userId, 
       accepted,
     });
+
+    // Actualizar el caché después de una interacción exitosa
+    setCacheItem(`userTermsStatus_${userId}`, accepted, 300000);
+
+    return response;
+
   } catch (error) {
     console.error('Error service al registrar la interacción de términos:', error);
     throw error;

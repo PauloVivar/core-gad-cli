@@ -8,6 +8,7 @@ import { LoginPage } from './auth/pages/LoginPage';
 import { NotFound } from './pages/NotFound';
 import { Home } from './pages/Home';
 import { Navbar } from './components/Navbar';
+import { AccountRecoveryPage } from './auth/pages/AccountRecoveryPage';
 
 const AppRoutes = () => {
   const { login } = useAuth();
@@ -35,6 +36,7 @@ const AppRoutes = () => {
           <>
             <Route path='/login' element={<LoginPage />} />
             <Route path='/register' element={<LoginPage />} />
+            <Route path='/recover-account' element={<AccountRecoveryPage />} />
 
             <Route path='/' element={<Home />} />
             <Route path='/*' element={<NotFound />} />

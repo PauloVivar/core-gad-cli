@@ -1,13 +1,32 @@
 //import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../services/authService';
-import { onLogin, onLogout, onInitLoading } from '@/store/slices/auth/authSlice';
+import { resetPassword, requestPasswordReset } from '../services/resetPasswordService';
+import { 
+  onLogin, 
+  onLogout, 
+  onInitLoading,
+
+  onPasswordResetRequest,
+  onPasswordResetSuccess,
+  onPasswordResetFailure,
+  onClearPasswordResetStatus,
+} from '@/store/slices/auth/authSlice';
 import Swal from 'sweetalert2';
 
 function useAuth() {
   //const [login, dispatch] = useReducer(loginReducer, initialLogin);
   const dispatch = useDispatch();
-  const { user, isAdmin, isAuth, isLoginLoading } = useSelector(state => state.auth);
+  const { 
+    user, 
+    isAdmin, 
+    isAuth, 
+    isLoginLoading,
+
+    passwordResetRequested,
+    passwordResetSuccess,
+    passwordResetError,
+  } = useSelector(state => state.auth);
 
   //const navigate = useNavigate();
 
@@ -68,6 +87,35 @@ function useAuth() {
     sessionStorage.clear();
   };
 
+  //reset password
+  const handlerRequestPasswordReset = async (email) => {
+    try {
+      dispatch(onPasswordResetRequest());
+      await requestPasswordReset(email);
+      // No despachamos éxito aquí porque solo se ha solicitado el restablecimiento
+      return { success: true };
+    } catch (error) {
+      dispatch(onPasswordResetFailure(error.response?.data?.message || 'Error al solicitar el restablecimiento de contraseña'));
+      throw error;
+    }
+  };
+
+  const handlerResetPassword = async (code, newPassword) => {
+    try {
+      dispatch(onPasswordResetRequest());
+      await resetPassword(code, newPassword);
+      dispatch(onPasswordResetSuccess());
+      return { success: true };
+    } catch (error) {
+      dispatch(onPasswordResetFailure(error.response?.data?.message || 'Error al restablecer la contraseña'));
+      throw error;
+    }
+  };
+
+  const clearPasswordResetStatus = () => {
+    dispatch(onClearPasswordResetStatus());
+  };
+
   return {
     login: {
       user,
@@ -77,6 +125,15 @@ function useAuth() {
     },
     handlerLogin,
     handlerLogout,
+
+    passwordReset: {
+      passwordResetRequested,
+      passwordResetSuccess,
+      passwordResetError,
+    },
+    handlerRequestPasswordReset,
+    handlerResetPassword,
+    clearPasswordResetStatus,
   };
 }
 

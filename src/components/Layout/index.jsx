@@ -20,7 +20,7 @@ const Layout = ({ children }) => {
         <main className='flex flex-1 flex-col gap-4 m-2 p-2 lg:gap-6'>
           
           {children}
-          <TermsAcceptanceModal />
+          {/* <TermsAcceptanceModal /> */}
         
         </main>
       </div>

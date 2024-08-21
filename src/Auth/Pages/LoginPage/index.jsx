@@ -45,6 +45,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { Layout } from '@/components/Layout';
+import { Separator } from '@/components/ui/separator';
 
 //mod email
 //Validation Schema Login
@@ -89,7 +90,7 @@ function LoginPage() {
   const [showTerms, setShowTerms] = useState(false);
 
   //login
-  const { login, handlerLogin  } = useAuth();
+  const { handlerLogin  } = useAuth();
 
   //register: Context useUsers Global Redux.
   const { initialUserForm, handlerRegisterUser, errors } = useUsers();
@@ -219,32 +220,6 @@ function LoginPage() {
     }
   };
 
-  //aceptación de los nuevos términos y condiciones por parte de un usuario que ya ha iniciado sesión.
-  // const handleAcceptTerms = async () => {
-  //   if (!login.user || !login.user.id) {
-  //     toast({
-  //       title: 'Error',
-  //       description: 'No se pudo identificar al usuario. Por favor, intente iniciar sesión nuevamente.',
-  //       variant: 'destructive',
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     await handleTermsAcceptance(login.user.id, true);
-  //     setShowTerms(false);
-  //     navigate('/users');
-  //   } catch (error) {
-  //     console.error('Error al aceptar los términos:', error);
-  //     toast({
-  //       title: 'Error',
-  //       description: 'Hubo un problema al aceptar los términos y condiciones.',
-  //       variant: 'destructive',
-  //     });
-  //   }
-  // };
-
-  //redirigir Tab login or register
   const handleTabChange = (value) => {
     setSelected(value);
     navigate(value === 'account' ? '/login' : '/register');
@@ -386,6 +361,10 @@ function LoginPage() {
 
                   <CardFooter className='flex flex-col'>
                     <Button type='submit'>Iniciar Sesión</Button>
+                    <NavLink to='/recover-account' className='hover:underline font-medium text-sm p-2'>
+                      ¿Olvidaste tu contraseña?
+                    </NavLink>
+                    <Separator />
                     <div className='mt-4 text-center text-sm'>
                       ¿No tienes una cuenta?{' '}
                       <NavLink to='/register' className='underline'>
@@ -460,7 +439,7 @@ function LoginPage() {
                           <FormLabel>Email</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder='Ingres su email'
+                              placeholder='Ingrese su email'
                               {...field}
                             />
                           </FormControl>
@@ -480,14 +459,14 @@ function LoginPage() {
                               onCheckedChange={field.onChange}
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
+                          <div className='space-y-1 leading-none'>
                             <FormLabel>
                               Términos de servicio y Política de privacidad.
                             </FormLabel>
                             <FormDescription>
-                              Acepto{" "}
+                              Acepto{' '}
                               <Link className='font-semibold underline' onClick={handleViewTerms}>Términos y Condiciones</Link>
-                              {" "}del servico.
+                              {' '}del servico.
                             </FormDescription>
                             <FormMessage />
                           </div>
@@ -498,6 +477,10 @@ function LoginPage() {
                   </CardContent>
                   <CardFooter className='flex flex-col'>
                     <Button type='submit'>Crear Cuenta</Button>
+                    <NavLink to='/recover-account' className='hover:underline font-medium text-sm p-2'>
+                      ¿Olvidaste tu contraseña?
+                    </NavLink>
+                    <Separator />
                     <div className='mt-4 text-center text-sm'>
                       ¿Ya tienes una cuenta?{' '}
                       <NavLink to='/login' className='underline'>
