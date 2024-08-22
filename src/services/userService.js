@@ -72,50 +72,20 @@ const remove = async (id) => {
 //   }
 // }
 
-const register = async ({ 
-  username, 
-  password, 
-  email,
-  admin, 
-  acceptedTerms,
-
-  ci,
-  fullName,
-  address,
-  phone,
-  taxpayerCity,
-  houseNumber,
-  taxpayerType,
-  legalPerson,
-  identificationType,
-  birthdate,
-  maritalStatus
-}) => {
+const register = async (userData) => {
   try {
-    return await usersApi.post(`${BASE_URL}/registration`, {
-      username,
-      password,
-      email,
-      admin,
-      acceptedTerms,
-      
-      ci,
-      fullName,
-      address,
-      phone,
-      taxpayerCity,
-      houseNumber,
-      taxpayerType,
-      legalPerson,
-      identificationType,
-      birthdate,
-      maritalStatus
-    });
+    return await usersApi.post(`${BASE_URL}/registration`, userData);
   } catch (error) {
     console.error('Error al registrar usuario:', error);
     throw error;
   }
-}
+};
 
-
-export { findAll, findAllPages, save, update, remove, register };
+export { 
+  findAll, 
+  findAllPages, 
+  save, 
+  update, 
+  remove, 
+  register,
+};

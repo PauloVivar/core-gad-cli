@@ -11,6 +11,7 @@ import { createSlice } from '@reduxjs/toolkit';
 // };
 
 export const initialUserForm = {
+  legalPerson: undefined,
   id: 0,
   password: '',
   email: '',
@@ -21,10 +22,8 @@ export const initialUserForm = {
   phone: '',
   taxpayerCity: '',
   houseNumber: '',
-  taxpayerType: 0,
-  legalPerson: 44,
-  identificationType: 33,
   birthdate: '',
+  disabilityPercentage: 0,
   maritalStatus: 37,
 
   admin: false,

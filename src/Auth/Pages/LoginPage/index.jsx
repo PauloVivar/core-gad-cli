@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { useUsers } from '@/hooks/useUsers';
 import { useTerms } from '@/hooks/useTerms';
@@ -96,22 +96,22 @@ const userLoginSchema = z.object({
 // });
 
 const userRegisterSchema = z.object({
+  legalPerson: z.enum(['44', '45', '46'], {
+    required_error: "Debe seleccionar un tipo de persona",
+  }),
   ci: z.string().min(10, 'El documento de identidad debe tener al menos 10 a 13 caracteres'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
   email: z.string().email('Ingrese un email válido.'),
 
-  fullName: z.string().min(1, 'El nombre completo es requerido.'),
-  address: z.string().min(1, 'La dirección es requerida.'),
-  phone: z.string().min(9, 'El teléfono debe tener al menos 9 dígitos.'),
-  taxpayerCity: z.string().min(1, 'La ciudad es requerida.'),
-  houseNumber: z.string().min(1, 'El número de casa es requerido.'),
-  birthdate: z.date({
-    required_error: 'A date of birth is required.',
-  }),
-  taxpayerType: z.number().default(0),
-  legalPerson: z.number().default(44),
-  identificationType: z.number().default(33),
+  fullName: z.string().min(1, 'El nombre completo es requerido.').optional(),
+  address: z.string().min(1, 'La dirección es requerida.').optional(),
+  phone: z.string().min(9, 'El teléfono debe tener al menos 9 dígitos.').optional(),
+  taxpayerCity: z.string().min(1, 'La ciudad es requerida.').optional(),
+  houseNumber: z.string().min(1, 'El número de casa es requerido.').optional(),
+  birthdate: z.date({required_error: 'A date of birth is required.'}).optional(),
+  disabilityPercentage: z.number().min(0).max(100).optional(),
   maritalStatus: z.number().default(37),
+
   admin: z.boolean().default(false).optional(),
   acceptedTerms: z.boolean().refine(val => val === true, {
     message: 'Debe aceptar los Términos y Condiciones.',
@@ -131,11 +131,16 @@ function LoginPage() {
   const [selected, setSelected] = useState(location.pathname === '/login' ? 'account' : 'register');
   const [showTerms, setShowTerms] = useState(false);
 
-  //login
-  const { login, handlerLogin  } = useAuth();
+  //test
+  //const [isValidating, setIsValidating] = useState(false);
+  //const [contribuyenteExists, setContribuyenteExists] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   //register: Context useUsers Global Redux.
-  const { initialUserForm, handlerRegisterUser, errors } = useUsers();
+  const { initialUserForm, handlerRegisterUser, errors} = useUsers();
+
+  //login
+  const { login, handlerLogin  } = useAuth();
 
   //Context useTerms Global Redux.
   const { 
@@ -144,7 +149,7 @@ function LoginPage() {
     userTermsStatus,
     recordingTermsInteractionError,
     getLatestTerms,
-    getCheckUserTermsStatus, 
+    getCheckUserTermsStatus,
     getRecordTermsInteraction,
   } = useTerms();
 
@@ -161,6 +166,16 @@ function LoginPage() {
     defaultValues: initialUserForm,
   });
   
+  //test
+  const { watch, setValue } = registerForm;
+  const legalPerson = watch('legalPerson');
+  //const ci = watch('ci');
+
+  // Función para manejar el cambio en el tipo de persona
+  const handleLegalPersonChange = (value) => {
+    setValue('legalPerson', value);
+    setShowForm(true);
+  };
 
   //maneja la aceptación de términos para el registro. TermsInteractionDTO
   const handleTermsAcceptance = async (userId, accepted) => {
@@ -226,7 +241,9 @@ function LoginPage() {
       // Asignar ci como username automáticamente
       const registrationData = {
         ...data,
-        username: data.ci
+        username: data.ci,
+        taxpayerType: data.taxpayerType || 0, // Valor por defecto
+        identificationType: legalPerson === 44 ? 33 : 36,
       };
 
       const result = await handlerRegisterUser(registrationData); 
@@ -442,24 +459,301 @@ function LoginPage() {
                 <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
 
                   <CardContent className='space-y-2'>
+
                     <FormField
                       control={registerForm.control}
-                      name='ci'
-                      className='space-y-1'
+                      name="legalPerson"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Documento de Identidad</FormLabel>
+                        <FormItem className="space-y-3">
+                          <FormLabel>Tipo de Persona</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder='Ingrese su documento de identidad'
-                              {...field}
-                            />
+                            <RadioGroup
+                              onValueChange={handleLegalPersonChange}
+                              value={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="44" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  PERSONA NATURAL
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="45" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  JURÍDICA DERECHO PÚBLICO
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="46" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  JURÍDICA DERECHO PRIVADO
+                                </FormLabel>
+                              </FormItem>
+                            </RadioGroup>
                           </FormControl>
-                          <FormMessage>{errors?.ci}</FormMessage>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
+                    {showForm && (
+                      <>
+                      
+                      </>
+                    )}
+
+                    <FormField
+                      control={registerForm.control}
+                      name='ci'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{legalPerson === 44 ? 'Cédula' : 'RUC'}</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder='Ingrese su documento de identidad'
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage>{errors?.ci}</FormMessage>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="button" 
+                      onClick={validateContribuyente} 
+                      disabled={isValidating}
+                    >
+                      {isValidating ? 'Validando...' : 'Validar Contribuyente'}
+                    </Button>
+
+                    {isValidating && <p>Verificando contribuyente...</p>}
+
+                    {!isValidating && (
+                        <>
+                          <FormField
+                            control={registerForm.control}
+                            name='fullName'
+                            className='space-y-1'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Nombre Completo</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field} 
+                                    readOnly={contribuyenteExists} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </>
+                      )
+                    }
+
+                    {!contribuyenteExists && (
+                        <>
+                          <FormField
+                            control={registerForm.control}
+                            name='address'
+                            className='space-y-1'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Dirección</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder='Ingrese su dirección'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className='flex flex-row w-full justify-center space-x-2'>
+                            <FormField
+                              control={registerForm.control}
+                              name='phone'
+                              className='space-y-1'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>Celular/ Teléfono</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder='Ingrese su celular o teléfono'
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={registerForm.control}
+                              name='taxpayerCity'
+                              className='space-y-1'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>Ciudad</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder='Ingrese la ciudad de residencia'
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <div className='flex flex-col sm:flex-row w-full justify-center space-y-4 sm:space-y-0 sm:space-x-4'>
+                            <FormField
+                              control={registerForm.control}
+                              name='houseNumber'
+                              render={({ field }) => (
+                                <FormItem className='w-full sm:w-1/2'>
+                                  <FormLabel>Número de Casa</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder='Ingrese el número de su casa'
+                                      className='w-full'
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={registerForm.control}
+                              name='birthdate'
+                              render={({ field }) => (
+                                <FormItem className='w-full sm:w-1/2'>
+                                  <FormLabel>Fecha de Cumpleaños</FormLabel>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant={'outline'}
+                                          className={cn(
+                                            'w-full h-10 px-3 text-left font-normal',
+                                            !field.value && 'text-muted-foreground'
+                                          )}
+                                        >
+                                          {field.value ? (
+                                            format(field.value, 'PPP')
+                                          ) : (
+                                            <span>Seleccione una fecha</span>
+                                          )}
+                                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className='w-auto p-0' align='start'>
+                                      <Calendar
+                                        mode='single'
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) =>
+                                          date > new Date() || date < new Date('1900-01-01')
+                                        }
+                                        initialFocus
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <div className='flex flex-row w-full justify-center space-x-2'>
+                            <FormField
+                              control={registerForm.control}
+                              name='disabilityPercentage'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>Porcentaje de discapacidad</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder='Ingrese el porcentaje de discapacidad'
+                                      className='w-full'
+                                      type="number"
+                                      min="0"
+                                      max="100"
+                                      step="1"
+                                      onKeyPress={(event) => {
+                                        if (!/[0-9]/.test(event.key)) {
+                                          event.preventDefault();
+                                        }
+                                      }}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={registerForm.control}
+                              name='maritalStatus'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>Estado Civil</FormLabel>
+                                  <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder='Seleccione el estado civil' />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value='37'>SOLTERO(A)</SelectItem>
+                                        <SelectItem value='38'>CASADO(A)</SelectItem>
+                                        <SelectItem value='39'>UNIÓN LIBRE</SelectItem>
+                                        <SelectItem value='40'>DIVORCIADO(A)</SelectItem>
+                                        <SelectItem value='41'>VIUDO(A)</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </FormControl>
+                                  <FormMessage>{errors?.maritalStatus}</FormMessage>
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                        </>
+                      )
+                    }
+
+                    <FormField
+                      control={registerForm.control}
+                      name='email'
+                      className='space-y-1'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder='Ingrese su email'
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage>{errors?.email}</FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                     
                     <FormField
                       control={registerForm.control}
                       name='password'
@@ -479,258 +773,6 @@ function LoginPage() {
                         </FormItem>
                       )}
                     />
-
-                    <FormField
-                      control={registerForm.control}
-                      name='email'
-                      className='space-y-1'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder='Ingrese su email'
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage>{errors?.email}</FormMessage>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={registerForm.control}
-                      name='fullName'
-                      className='space-y-1'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre Completo</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder='Ingrese sus nombres y apellidos'
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    /> 
-
-                    <FormField
-                      control={registerForm.control}
-                      name='address'
-                      className='space-y-1'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Dirección</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder='Ingrese su dirección'
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className='flex flex-row w-full justify-center space-x-2'>
-                      <FormField
-                        control={registerForm.control}
-                        name='phone'
-                        className='space-y-1'
-                        render={({ field }) => (
-                          <FormItem className='w-full'>
-                            <FormLabel>Celular/ Teléfono</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Ingrese su celular o teléfono'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name='taxpayerCity'
-                        className='space-y-1'
-                        render={({ field }) => (
-                          <FormItem className='w-full'>
-                            <FormLabel>Ciudad</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Ingrese la ciudad de residencia'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className='flex flex-col sm:flex-row w-full justify-center space-y-4 sm:space-y-0 sm:space-x-4'>
-                      <FormField
-                        control={registerForm.control}
-                        name='houseNumber'
-                        render={({ field }) => (
-                          <FormItem className='w-full sm:w-1/2'>
-                            <FormLabel>Número de Casa</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Ingrese el número de su casa'
-                                className='w-full'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={registerForm.control}
-                        name='birthdate'
-                        render={({ field }) => (
-                          <FormItem className='w-full sm:w-1/2'>
-                            <FormLabel>Fecha de Cumpleaños</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={'outline'}
-                                    className={cn(
-                                      'w-full h-10 px-3 text-left font-normal',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(field.value, 'PPP')
-                                    ) : (
-                                      <span>Seleccione una fecha</span>
-                                    )}
-                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className='w-auto p-0' align='start'>
-                                <Calendar
-                                  mode='single'
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={(date) =>
-                                    date > new Date() || date < new Date('1900-01-01')
-                                  }
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <div className='flex flex-row w-full justify-center space-x-2'>
-                      <FormField
-                        control={registerForm.control}
-                        name='taxpayerType'
-                        render={({ field }) => (
-                          <FormItem className='w-full'>
-                            <FormLabel>Tipo de Contribuyente</FormLabel>
-                            <FormControl>
-                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Seleccione el tipo de contribuyente' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value='0'>NORMAL</SelectItem>
-                                  <SelectItem value='1'>PROVEEDOR</SelectItem>
-                                  <SelectItem value='2'>EMPLEADO</SelectItem>
-                                  <SelectItem value='3'>TRABAJADOR</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage>{errors?.taxpayerType}</FormMessage>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={registerForm.control}
-                        name='legalPerson'
-                        render={({ field }) => (
-                          <FormItem className='w-full'>
-                            <FormLabel>Tipo de Persona</FormLabel>
-                            <FormControl>
-                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Seleccione el tipo de persona' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value='44'>PERSONA NATURAL</SelectItem>
-                                  <SelectItem value='45'>JURÍDICA DERECHO PÚBLICO</SelectItem>
-                                  <SelectItem value='46'>JURÍDICA DERECHO PRIVADO</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage>{errors?.legalPerson}</FormMessage>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className='flex flex-row w-full justify-center space-x-2'>
-                      <FormField
-                        control={registerForm.control}
-                        name='identificationType'
-                        render={({ field }) => (
-                          <FormItem className='w-full'>
-                            <FormLabel>Tipo de Identificación</FormLabel>
-                            <FormControl>
-                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Seleccione el tipo de identificación' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value='33'>CÉDULA</SelectItem>
-                                  <SelectItem value='34'>PASAPORTE</SelectItem>
-                                  <SelectItem value='36'>RUC</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage>{errors?.identificationType}</FormMessage>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={registerForm.control}
-                        name='maritalStatus'
-                        render={({ field }) => (
-                          <FormItem className='w-full'>
-                            <FormLabel>Estado Civil</FormLabel>
-                            <FormControl>
-                              <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Seleccione el estado civil' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value='37'>SOLTERO(A)</SelectItem>
-                                  <SelectItem value='38'>CASADO(A)</SelectItem>
-                                  <SelectItem value='39'>UNIÓN LIBRE</SelectItem>
-                                  <SelectItem value='40'>DIVORCIADO(A)</SelectItem>
-                                  <SelectItem value='41'>VIUDO(A)</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage>{errors?.maritalStatus}</FormMessage>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
 
                     <FormField
                       control={registerForm.control}
