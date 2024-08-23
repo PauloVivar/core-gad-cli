@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '@/auth/hooks/useAuth';
-import { findAllPages, remove, save, update, register } from '@/services/userService';
+import { findAllPages, save, update, remove, register } from '@/services/userService';
+import { checkContribuyenteExists, getContribuyenteInfo } from '@/services/taxpayerService';
 import {
   initialUserForm,
   addUser,
@@ -12,6 +13,14 @@ import {
   onOpenForm,
   onCloseForm,
   loadingError,
+
+  setContribuyenteExists,
+  setContribuyenteInfo,
+  clearContribuyenteInfo,
+
+  setLoading,
+  setErrors,
+  clearErrors,
 } from '@/store/slices/users/usersSlice';
 
 import Swal from 'sweetalert2';
@@ -37,7 +46,10 @@ const useUsers = () => {
     visibleForm, 
     errors, 
     isLoading, 
-    paginator
+    paginator,
+
+    contribuyenteExists,
+    contribuyenteInfo,
   } = useSelector((state) => state.users);
 
   const dispatch = useDispatch();
@@ -58,8 +70,37 @@ const useUsers = () => {
     }
   };
 
+  const handlerCheckContribuyenteExists = async (ci) => {
+    dispatch(setLoading(true));
+    try {
+      const response = await checkContribuyenteExists(ci);
+      return response.exists;
+    } catch (error) {
+      dispatch(setErrors({ ci: 'Error al verificar contribuyente' }));
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+  const handlerGetContribuyenteInfo = async (ci) => {
+    dispatch(setLoading(true));
+    try {
+      const response = await getContribuyenteInfo(ci);
+      dispatch(setContribuyenteInfo(response));
+      return response;
+    } catch (error) {
+      dispatch(setErrors({ ci: 'Error al obtener información del contribuyente' }));
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
   const handlerRegisterUser = async (user) => {
     //let response;
+    dispatch(setLoading(true));
+    dispatch(clearErrors());
     try {
       const response = await register(user);
       console.log('respuesta del registro: ', response.data);
@@ -99,9 +140,12 @@ const useUsers = () => {
             dispatch(loadingError({ email: 'El email ya existe' }));
           }
       } else {
-        console.error('Error al registrar usuario:', error);
+        //console.error('Error al registrar usuario:', error);
+        dispatch(setErrors({ general: 'Error al registrar usuario' }));
         throw error;
       }
+    } finally {
+      dispatch(setLoading(false));
     }
   }
 
@@ -216,14 +260,21 @@ const useUsers = () => {
     dispatch(loadingError({}));
   };
 
+  const handlerClearContribuyenteInfo = () => {
+    dispatch(clearContribuyenteInfo());
+  };
+
   return {
     users,
     userSelected,
-    initialUserForm,
     visibleForm,
     errors,
     isLoading,
     paginator,
+    contribuyenteExists,
+    contribuyenteInfo,
+
+    initialUserForm,
     getUsers,
     handlerRegisterUser,
     handlerAddUser,
@@ -231,6 +282,10 @@ const useUsers = () => {
     handlerSelectedUserForm,
     handlerOpenForm,
     handlerCloseForm,
+
+    handlerCheckContribuyenteExists,
+    handlerGetContribuyenteInfo,
+    handlerClearContribuyenteInfo,
   };
 };
 
