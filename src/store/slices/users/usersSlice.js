@@ -1,17 +1,38 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 //Se inicializa id=0 para seleccionar y update.
+// export const initialUserForm = {
+//   id: 0,
+//   username: '',
+//   email: '',
+//   password: '',
+//   admin: false,
+//   acceptedTerms: false, //test
+// };
+
 export const initialUserForm = {
+  legalPerson: undefined,
   id: 0,
-  username: '',
-  email: '',
+  username: '',  // Añadido para mantener consistencia
   password: '',
+  email: '',
+
+  ci: '',
+  fullName: '',
+  address: '',
+  phone: '',
+  taxpayerCity: '',
+  houseNumber: '',
+  birthdate: '',
+  disabilityPercentage: 0,
+  maritalStatus: 37,
+
   admin: false,
-  acceptedTerms: false, //test
+  acceptedTerms: false,
 };
 
 const initialErrors = {
-  username: '',
+  ci: '',
   email: '',
   password: '',
 };
@@ -25,6 +46,8 @@ export const usersSlice = createSlice ({
     errors: initialErrors,                    //guardar errores config en el backend
     isLoading: true,                          //espera hasta que carga la grilla(tabla)
     paginator: {},                            //paginacion
+    contribuyenteExists: false,               //estado para manejar la existencia del contribuyente
+    contribuyenteInfo: null,                  //estado para almacenar la información del contribuyente
   },
   reducers: {
     addUser: (state, action) => {
@@ -36,6 +59,8 @@ export const usersSlice = createSlice ({
       ];
       state.userSelected= initialUserForm;
       state.visibleForm= false;
+      state.contribuyenteExists = null;         //era antes false
+      state.contribuyenteInfo = null;
     },
     removeUser: (state, action) => {
       state.users = state.users.filter(user => user.id !== action.payload);
@@ -68,10 +93,39 @@ export const usersSlice = createSlice ({
     onCloseForm: (state) => {
       state.visibleForm =false;
       state.userSelected= initialUserForm;
+      state.contribuyenteExists = false;
+      state.contribuyenteInfo = null;
     },
+    //posible eliminación
     loadingError: (state, action) => {
       state.errors = action.payload;
-    }
+    },
+
+    setContribuyenteExists: (state, action) => {
+      state.contribuyenteExists = action.payload;
+    },
+    setContribuyenteInfo: (state, action) => {
+      state.contribuyenteInfo = action.payload;
+    },
+    clearContribuyenteInfo: (state) => {
+      state.contribuyenteExists = false;
+      state.contribuyenteInfo = null;
+    },
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+    setErrors: (state, action) => {
+      if (typeof action.payload === 'string') {
+        // Si es un string, asumimos que es un error general
+        state.errors = { ...initialErrors, general: action.payload };
+      } else if (typeof action.payload === 'object') {
+        // Si es un objeto, actualizamos los errores específicos
+        state.errors = { ...state.errors, ...action.payload };
+      }
+    },
+    clearErrors: (state) => {
+      state.errors = initialErrors;
+    },
   }
 });
 
@@ -84,5 +138,12 @@ export const {
   onOpenForm,
   onCloseForm,
   loadingError,
+
+  setContribuyenteExists,
+  setContribuyenteInfo,
+  clearContribuyenteInfo,
+  setLoading,
+  setErrors,
+  clearErrors
 } = usersSlice.actions;
 
