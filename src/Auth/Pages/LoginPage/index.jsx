@@ -118,9 +118,9 @@ const userRegisterSchema = z.object({
   phone: z.string().min(9, 'El teléfono debe tener al menos 9 dígitos.').optional(),
   taxpayerCity: z.string().min(1, 'La ciudad es requerida.').optional(),
   houseNumber: z.string().min(1, 'El número de casa es requerido.').optional(),
-  birthdate: z.date({required_error: 'A date of birth is required.'}).optional(),
-  disabilityPercentage: z.number().int().min(0).max(100).optional(),
-  maritalStatus: z.number().int().min(37).max(41).optional(),
+  birthdate: z.date({required_error: 'A date of birth is required.'}).optional().nullable(),
+  disabilityPercentage: z.number().int().min(0).max(100).optional().nullable(),
+  maritalStatus: z.number().int().min(37).max(41).optional().nullable(),
 });
 
 //initial Login
@@ -330,17 +330,26 @@ function LoginPage() {
         return;
       }
 
+      // Filtrar campos vacíos o nulos
+      const filteredData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v != null && v !== '')
+      );
+
       // Asignar ci como username automáticamente
       const registrationData = {
-        ...data,
-        username: data.ci,
+        ...filteredData,
+        username: filteredData.ci,
+        //password: data.password,
+        //email: data.email,
+        //acceptedTerms: data.acceptedTerms,
         taxpayerType: 0, // Valor por defecto
         identificationType: legalPerson === '44' ? 33 : 36,
         legalPerson: parseInt(legalPerson),
-        disabilityPercentage: 0,
+        contribuyenteExists: contribuyenteExists,
       };
 
-      
+      console.log('Datos de registro a enviar:', registrationData);
+
       const result = await handlerRegisterUser(registrationData); 
       if (result && result.id) {
         await handleTermsAcceptance(result.id, true);
