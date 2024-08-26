@@ -74,6 +74,7 @@ const useUsers = () => {
     dispatch(setLoading(true));
     try {
       const response = await checkContribuyenteExists(ci);
+      dispatch(setContribuyenteExists(response.exists));   //actualiza estado global (contribuyenteExists)
       return response.exists;
     } catch (error) {
       dispatch(setErrors({ ci: 'Error al verificar contribuyente' }));

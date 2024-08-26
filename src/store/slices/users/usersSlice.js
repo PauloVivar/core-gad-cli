@@ -59,7 +59,7 @@ export const usersSlice = createSlice ({
       ];
       state.userSelected= initialUserForm;
       state.visibleForm= false;
-      state.contribuyenteExists = false;
+      state.contribuyenteExists = null;         //era antes false
       state.contribuyenteInfo = null;
     },
     removeUser: (state, action) => {
