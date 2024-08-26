@@ -45,10 +45,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
 import { Layout } from '@/components/Layout';
-import { Separator } from '@/components/ui/separator';
 
 import {
   Popover,
@@ -74,7 +71,6 @@ import log_azo from '../../../assets/log_azo.png';
 
 //mod email
 //Validation Schema Login
-
 const userLoginSchema = z.object({
   username: z.string().min(1, {
     message: 'El username es requerido.',
@@ -107,7 +103,7 @@ const userRegisterSchema = z.object({
     required_error: 'Debe seleccionar un tipo de persona',
   }),
   ci: z.string().min(10, 'El documento de identidad debe tener al menos 10 a 13 caracteres'),
-  fullName: z.string().min(1, 'El nombre completo es requerido.').optional(),
+  fullName: z.string().min(1, 'El nombre completo es requerido.'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
   email: z.string().email('Ingrese un email válido.'),
   admin: z.boolean().default(false).optional(),
@@ -121,8 +117,8 @@ const userRegisterSchema = z.object({
   taxpayerCity: z.string().min(1, 'La ciudad es requerida.').optional(),
   houseNumber: z.string().min(1, 'El número de casa es requerido.').optional(),
   birthdate: z.date({required_error: 'A date of birth is required.'}).optional(),
-  disabilityPercentage: z.number().int().min(0).max(100).optional(),
-  maritalStatus: z.number().int().min(37).max(41).optional(),
+  disabilityPercentage: z.number().min(0).max(100).optional(),
+  maritalStatus: z.number().default(37),
 });
 
 //initial Login
@@ -140,8 +136,9 @@ function LoginPage() {
   const [selected, setSelected] = useState(location.pathname === '/login' ? 'account' : 'register');
   const [showTerms, setShowTerms] = useState(false);
 
-  //login
-  const { handlerLogin  } = useAuth();
+  //test
+  const [isValidating, setIsValidating] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   //register: Context useUsers Global Redux.
   const { 
@@ -155,6 +152,9 @@ function LoginPage() {
     handlerCheckContribuyenteExists, 
     handlerGetContribuyenteInfo,
     handlerClearContribuyenteInfo } = useUsers();
+
+  //login
+  const { login, handlerLogin  } = useAuth();
 
   //Context useTerms Global Redux.
   const { 
@@ -202,23 +202,6 @@ function LoginPage() {
     // });
   };
 
-  const resetFormFields = () => {
-    registerForm.reset({
-      ...registerForm.getValues(),
-      fullName: '',
-      email: '',
-      password: '',
-      address: '',
-      phone: '',
-      taxpayerCity: '',
-      houseNumber: '',
-      birthdate: undefined,
-      disabilityPercentage: 0,
-      maritalStatus: 37,
-      acceptedTerms: false,
-    });
-  };
-
   const validateContribuyente = async () => {
     const ci = registerForm.getValues('ci');
     if (!ci) {
@@ -226,28 +209,19 @@ function LoginPage() {
       return;
     }
 
-    console.log('1 prueba_ci ', ci);
-    console.log('2 contribuyenteExists ', contribuyenteExists);
+    console.log('prueba ci ', ci);
 
     setIsValidating(true);
-    setShowNewFullnameField(true);
-    resetFormFields();
     try {
       const exists = await handlerCheckContribuyenteExists(ci);
-      console.log('3 handlerCheckContribuyenteExists: ', exists);
+      console.log('validado en validateContribuyente: ', exists);
       if (exists) {
         const info = await handlerGetContribuyenteInfo(ci);
         setValue('fullName', info.fullName);
         registerForm.register('fullName', { disabled: true });
-        setShowNewUserFields(true);
-        setShowNewContribuyenteButton(false);
-        setShowNewContribuyenteFields(false);
       } else {
         setValue('fullName', '');
         registerForm.register('fullName', { disabled: false });
-        setShowNewContribuyenteButton(true);
-        setShowNewUserFields(false);
-        setShowNewContribuyenteFields(false);
       }
     } catch (error) {
       console.error('Error al verificar contribuyente:', error);
@@ -256,10 +230,6 @@ function LoginPage() {
       setIsValidating(false);
     }
   };
-
-  // const showNewContribuyenteForm = () => {
-  //   setShowNewContribuyenteFields(true);
-  // };
 
   //maneja la aceptación de términos para el registro. TermsInteractionDTO
   const handleTermsAcceptance = async (userId, accepted) => {
@@ -330,10 +300,8 @@ function LoginPage() {
         taxpayerType: 0, // Valor por defecto
         identificationType: legalPerson === '44' ? 33 : 36,
         legalPerson: parseInt(legalPerson),
-        disabilityPercentage: 0,
       };
 
-      
       const result = await handlerRegisterUser(registrationData); 
       if (result && result.id) {
         await handleTermsAcceptance(result.id, true);
@@ -373,6 +341,7 @@ function LoginPage() {
     }
   };
 
+  //redirigir Tab login or register
   const handleTabChange = (value) => {
     setSelected(value);
     navigate(value === 'account' ? '/login' : '/register');
@@ -522,10 +491,6 @@ function LoginPage() {
 
                   <CardFooter className='flex flex-col'>
                     <Button type='submit'>Iniciar Sesión</Button>
-                    <NavLink to='/recover-account' className='hover:underline font-medium text-sm p-2'>
-                      ¿Olvidaste tu contraseña?
-                    </NavLink>
-                    <Separator />
                     <div className='mt-4 text-center text-sm'>
                       ¿No tienes una cuenta?{' '}
                       <NavLink to='/register' className='underline'>
@@ -601,7 +566,7 @@ function LoginPage() {
                           name='ci'
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{legalPerson === '44' ? 'Cédula' : 'RUC'}</FormLabel>
+                              <FormLabel>{legalPerson === 44 ? 'Cédula' : 'RUC'}</FormLabel>
                               <FormControl>
                                 <Input 
                                   placeholder='Ingrese su documento de identidad'
@@ -623,87 +588,23 @@ function LoginPage() {
                             'Validar'
                           )}
                         </Button>
-                        {contribuyenteExists === true && (
-                          <Alert className='text-green-700'>
-                            <AlertCircle className='h-4 w-4'/>
-                            <AlertTitle>¡Exitoso!</AlertTitle>
-                            <AlertDescription className='text-green-700'>
-                              El contribuyente existe. Por favor, complete los campos adicionales para asociar su cuenta.
-                            </AlertDescription>
-                          </Alert>
-                        )}
-                        {(contribuyenteExists === false && showNewContribuyenteButton) && (
-                          <>
-                            <Alert variant='destructive'>
-                              <AlertCircle className='h-4 w-4' />
-                              <AlertTitle>¡Atención!</AlertTitle>
-                              <AlertDescription>
-                                El contribuyente no existe en nuestra base de datos, crear nuevo contribuyente.
-                              </AlertDescription>
-                            </Alert>
-                            <Button type='button' variant='destructive' onClick={() => setShowNewContribuyenteFields(true)}>
-                              Crear nuevo contribuyente
-                            </Button>
-                          </>
-                        )}
                       </div>
                     )}
 
-                    {showNewFullnameField && (
-                      <FormField
-                        control={registerForm.control}
-                        name='fullName'
-                        className='space-y-1'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nombre Completo</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Ingrese sus Nombres y Apellidos'
-                                {...field} 
-                                readOnly={contribuyenteExists} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-
-                    {(contribuyenteExists || showNewContribuyenteFields || showNewUserFields) && (
+                    {contribuyenteExists !== null && (
                       <>
                         <FormField
                           control={registerForm.control}
-                          name='email'
+                          name='fullName'
                           className='space-y-1'
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>Nombre Completo</FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder='Ingrese su email'
-                                  {...field}
-                                />
+                                <Input 
+                                  {...field} 
+                                  readOnly={contribuyenteExists} />
                               </FormControl>
-                              <FormMessage>{errors?.email}</FormMessage>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={registerForm.control}
-                          name='password'
-                          className='space-y-1'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Contraseña</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder='Ingrese su password'
-                                  type='password'
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormDescription>Ejemplo de una contraseña segura: !d8Jqz7@f4R$1P</FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -711,8 +612,7 @@ function LoginPage() {
                       </>
                     )}
 
-                    {(contribuyenteExists === false && showNewContribuyenteFields) && (
-                    //{contribuyenteExists && (
+                    {contribuyenteExists && (
                       <>
                         <FormField
                           control={registerForm.control}
@@ -840,24 +740,18 @@ function LoginPage() {
                                 <FormLabel>Porcentaje de discapacidad</FormLabel>
                                 <FormControl>
                                   <Input
-                                    {...field}
                                     placeholder='Ingrese el porcentaje de discapacidad'
                                     className='w-full'
                                     type='number'
                                     min='0'
                                     max='100'
                                     step='1'
-                                    //onChange={(e) => field.onChange(Number(e.target.value))}
-                                    value={field.value ?? ''}
-                                    onChange={(e) => {
-                                      const value = e.target.value === '' ? null : Number(e.target.value);
-                                      field.onChange(value);
+                                    onKeyPress={(event) => {
+                                      if (!/[0-9]/.test(event.key)) {
+                                        event.preventDefault();
+                                      }
                                     }}
-                                    // onKeyPress={(event) => {
-                                    //   if (!/[0-9]/.test(event.key)) {
-                                    //     event.preventDefault();
-                                    //   }
-                                    // }}
+                                    {...field}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -872,11 +766,7 @@ function LoginPage() {
                               <FormItem className='w-full'>
                                 <FormLabel>Estado Civil</FormLabel>
                                 <FormControl>
-                                  {/* <Select onValueChange={field.onChange} defaultValue={field.value.toString()}> */}
-                                  <Select 
-                                    onValueChange={(value) => field.onChange(Number(value))} 
-                                    value={field.value?.toString()}
-                                  >
+                                  <Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
                                     <SelectTrigger>
                                       <SelectValue placeholder='Seleccione el estado civil' />
                                     </SelectTrigger>
@@ -898,40 +788,73 @@ function LoginPage() {
                       </>
                     )}
 
-                    {(contribuyenteExists || showNewContribuyenteFields || showNewUserFields) && (
-                    //{legalPerson && (
-                      <>
-                        <FormField
-                          control={registerForm.control}
-                          name='acceptedTerms'
-                          render={({ field }) => (
-                            <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                              <div className='space-y-1 leading-none'>
-                                <FormLabel>
-                                  Términos de servicio y Política de privacidad.
-                                </FormLabel>
-                                <FormDescription>
-                                  Acepto{' '}
-                                  <Link className='font-semibold underline' onClick={handleViewTerms}>Términos y Condiciones</Link>
-                                  {' '}del servico.
-                                </FormDescription>
-                                <FormMessage />
-                              </div>
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
+                    <FormField
+                      control={registerForm.control}
+                      name='email'
+                      className='space-y-1'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder='Ingrese su email'
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage>{errors?.email}</FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                     
+                    <FormField
+                      control={registerForm.control}
+                      name='password'
+                      className='space-y-1'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contraseña</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder='Ingrese su password'
+                              type='password'
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>Ejemplo de una contraseña segura: !d8Jqz7@f4R$1P</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={registerForm.control}
+                      name='acceptedTerms'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className='space-y-1 leading-none'>
+                            <FormLabel>
+                              Términos de servicio y Política de privacidad.
+                            </FormLabel>
+                            <FormDescription>
+                              Acepto{' '}
+                              <Link className='font-semibold underline' onClick={handleViewTerms}>Términos y Condiciones</Link>
+                              {' '}del servico.
+                            </FormDescription>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
 
                   </CardContent>
                   <CardFooter className='flex flex-col'>
-                    <Button type='submit' disabled={isRegistering || !ci || !registerForm.watch('email')}>
+                    <Button type='submit' disabled={isRegistering}>
                       {isRegistering ? (
                         <>
                           <Loader2 className='mr-2 h-4 w-4 animate-spin' />
